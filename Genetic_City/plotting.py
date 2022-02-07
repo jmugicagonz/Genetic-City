@@ -100,7 +100,7 @@ def grid_plot():
 
     colors=['white', 'purple', 'green', 'red']
     city_n=1
-    directory = '/Users/AndresRico/Desktop/working/Genetic-City/Genetic_City/plotting'
+    directory = 'C:/Users/adminlocal/Documents/WorkspacesPython/Genetic-City/Genetic_City/plotting/'
 
     for files in os.listdir(directory):
         f = os.path.join(directory, files)
@@ -112,6 +112,6 @@ def grid_plot():
 
             grid=Grid(12, 12, grid_list)
             grid.plot_grid(colors)
-            plt.savefig('/Users/AndresRico/Desktop/working/Genetic-City/Genetic_City/images/'+str(files)+'.png')
+            plt.savefig('C:/Users/adminlocal/Documents/WorkspacesPython/Genetic-City/Genetic_City/images/'+str(files)+'.png')
 
 grid_plot()

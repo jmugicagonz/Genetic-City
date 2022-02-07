@@ -9,6 +9,8 @@
 ╚██████╔╝███████╗██║ ╚████║███████╗   ██║   ██║╚██████╗    ╚██████╗██║   ██║      ██║
  ╚═════╝ ╚══════╝╚═╝  ╚═══╝╚══════╝   ╚═╝   ╚═╝ ╚═════╝     ╚═════╝╚═╝   ╚═╝      ╚═╝
 
+Juan Mugica
+
 Genetic algorithm for city design main algorithm code.
 
 By: Andres Rico - aricom@mit.edu Visitng Student MIT Media Lab - City Science Group
@@ -28,7 +30,7 @@ import matplotlib.pyplot as plt                                                 
 from numpy import empty
 from citygenerationfunctions import *                                           #Functions for creating new city arrays.
 from evaluator import evaluate_cities                                           #Functions for evaluation of cities.
-from evaluator import *                                                 #Functions for evaluation of cities.
+from evaluator import *                                                         #Functions for evaluation of cities.
 from progressbar import printProgressBar                                        #Helps with progress bar in terminal.
 from crossfunctions import cross_individuals                                    #Functions for crossing individuals.
 from mutation_functions import mutate_individuals                               #Functions for mutating individuals.
@@ -96,7 +98,7 @@ for column_blocks in range(grid_size):
             print(current_best_individual)"""
             #city_plot(current_best_individual, block_size)
             final_blocks[row_blocks*block_size:(row_blocks*block_size)+block_size, column_blocks*block_size:(column_blocks*block_size)+block_size] = np.reshape(best_found_indiv, (block_size, block_size))
-            np.savetxt('/Users/AndresRico/Desktop/working/Genetic-City/Genetic_City/plotting/block'+str(column_blocks)+'_'+str(row_blocks)+'gen'+str(generation)+'.txt',final_blocks,delimiter=',')
+            np.savetxt('C:/Users/adminlocal/Documents/WorkspacesPython/Genetic-City/Genetic_City/plotting/block'+str(column_blocks)+'_'+str(row_blocks)+'gen'+str(generation)+'.txt',final_blocks,delimiter=',')
 
             #Save Best Individual if Better than Last
             if evaluation_vector[np.argmax(evaluation_vector)] > best_found_evaluation:
