@@ -24,13 +24,14 @@ def cross(parent1, parent2, probability ): #Function takes two parents as inputs
     fullarray[1,:] = parent2
 
     for inc in range (0, parent1.shape[0]): #Chooses section of individuals to "cut" for cross.
+        #TODO: review as making an average is an error here
         if random() < probability:
             fullarray[0][inc] = round((parent2[inc]+parent1[inc])/2)
             fullarray[1][inc] = round((parent2[inc]+parent1[inc])/2)
 
         return fullarray
 
-def cross_individuals(input_city_pop, crossprob, population, citysize): #Complete cross fucntion for an entire population.
+def cross_individuals(input_city_pop, crossprob, population, citysize): #Complete cross function for an entire population.
     printProgressBar(0, population, prefix = 'Population Cross Progress:', suffix = 'Complete', length = 50)
     for i in range(0,50):
         np.random.shuffle(input_city_pop)

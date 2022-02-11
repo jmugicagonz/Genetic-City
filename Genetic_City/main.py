@@ -25,6 +25,7 @@ MIT Media Lab - City Science Group
 
 """
 
+from turtle import distance
 import numpy as np                                                              #Matrix and array handling.
 import matplotlib.pyplot as plt                                                 #Plotting
 from numpy import empty
@@ -37,12 +38,12 @@ from mutation_functions import mutate_individuals                               
 from selectionfunctions import *                                                #Functions for best individual selection.
 from plotting import *
 
-population_size = 1000 #Needs to be an even number above 4
+population_size = 6 #1000 #Needs to be an even number above 4, as it is necessary for crosses, when you pair individuals.
 tournament_individuals = 2 #Needs to be between 2-half of the population.
-block_size = 4
-grid_size = 3 #Square dimension for grid.
+block_size = 40 #4
+grid_size = 1#3 #Square dimension for grid.
 mutation_prob = .8 #Must be between 0 - 1
-generations = 15 #Specify number of desired generations
+generations = 1 #15 #Specify number of desired generations
 cross_probability = .5 #Uniform crosses
 building_types = 3 # [1 = Office, 2 = Park, 3 = Residential]
 
@@ -54,11 +55,14 @@ mutateded_population_matrix = np.zeros((population_size, block_size*block_size))
 best_found_ev = np.zeros(generations) #For Graph
 gen = np.arange(generations) + 1
 best_found_indiv = np.zeros(block_size * block_size)
-best_found_evaluation = 0 #Saves best solution
+best_found_evaluation = -1e10 #Saves best solution
 
 distance_table = look_up_table(block_size)
 
 final_blocks = np.zeros((block_size*grid_size,block_size*grid_size ))
+
+visualizations = False
+
 
 for column_blocks in range(grid_size):
 
@@ -79,16 +83,13 @@ for column_blocks in range(grid_size):
             #Selection
             selected_matrix = select_cities_rough(evaluation_vector, population_matrix, population_size, block_size,best_found_indiv,best_found_evaluation)
             #selected_matrix = select_cities_tournament(evaluation_vector, population_matrix, population_size, block_size,tournament_individuals)
-
             #Cross
             crossed_population_matrix = cross_individuals(selected_matrix, cross_probability, population_size, block_size)
-
             #Mutation
+            #TODO: fix name
             mutateded_population_matrix = mutate_individuals(crossed_population_matrix, mutation_prob, population_size, block_size, building_types)
-
             # Evaluation of Population
             evaluation_vector = evaluate_cities(mutateded_population_matrix, population_size, distance_table)
-
 
             current_best_individual = mutateded_population_matrix[np.argmax(evaluation_vector),:] #Print best individual from population.
             best_found_ev[generation] = evaluation_vector[np.argmax(evaluation_vector)]
@@ -98,7 +99,7 @@ for column_blocks in range(grid_size):
             print(current_best_individual)"""
             #city_plot(current_best_individual, block_size)
             final_blocks[row_blocks*block_size:(row_blocks*block_size)+block_size, column_blocks*block_size:(column_blocks*block_size)+block_size] = np.reshape(best_found_indiv, (block_size, block_size))
-            np.savetxt('C:/Users/adminlocal/Documents/WorkspacesPython/Genetic-City/Genetic_City/plotting/block'+str(column_blocks)+'_'+str(row_blocks)+'gen'+str(generation)+'.txt',final_blocks,delimiter=',')
+            if visualizations: np.savetxt('C:/Users/adminlocal/Documents/WorkspacesPython/Genetic-City/Genetic_City/plotting/block'+str(column_blocks)+'_'+str(row_blocks)+'gen'+str(generation)+'.txt',final_blocks,delimiter=',')
 
             #Save Best Individual if Better than Last
             if evaluation_vector[np.argmax(evaluation_vector)] > best_found_evaluation:
@@ -107,17 +108,18 @@ for column_blocks in range(grid_size):
                 for times in range (0, block_size * block_size):
                     best_found_indiv[times] = current_best_individual[times]
 
-        print('THE BEST BLOCK DESIGN OF ALL WAS:') #Prints and plots final results of algorithm.
-        print(best_found_indiv)
-        print('WITH AN EVALUATION OF:')
-        print(best_found_evaluation)
+        #print('THE BEST BLOCK DESIGN OF ALL WAS:') #Prints and plots final results of algorithm.
+        #print(best_found_indiv)
+        #print('WITH AN EVALUATION OF:')
+        #print(best_found_evaluation)
 
         final_blocks[row_blocks*block_size:(row_blocks*block_size)+block_size, column_blocks*block_size:(column_blocks*block_size)+block_size] = np.reshape(best_found_indiv, (block_size, block_size))
         best_found_indiv = np.zeros(block_size * block_size)
         best_found_evaluation = 0
-        np.savetxt('city_mambers.txt',final_blocks,delimiter=',')
+        np.savetxt('C:/Users/adminlocal/Documents/WorkspacesPython/Genetic-City/Genetic_City/'+'city_members.txt',final_blocks,delimiter=',')
 
 
 #print(final_blocks)
 #plot_best_found_curve(gen, best_found_ev)
 city_plot(final_blocks, block_size, grid_size)
+if visualizations: grid_plot(block_size, grid_size)

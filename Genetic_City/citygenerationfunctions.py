@@ -16,15 +16,14 @@ MIT Media Lab - City Science Group
 
 import numpy as np
 from progressbar import printProgressBar #Import progress bar function.
+from random import *
 
 #Function creates a random city design by assigning a specific number to each block.
 #Number key is based on the block representation used on the Bento Scope.
+#TODO: This function should be rethought as evey number between 0->1.49 will go to 1, being the result not an uniform distribution. -> CHANGE
 def citygen(desired_size, types):
-    city = np.round(np.random.rand(desired_size,desired_size)*types) #Random matrix of specified size with numbers between 0 - types.
-    for x in range(0, desired_size):
-        for y in range(0 , desired_size):
-            if (city[x][y]) == 0: #Change all the zeros into ones.
-                city[x][y] = 1
+    #city = np.round(np.random.rand(desired_size,desired_size)*types) #Random matrix of specified size with numbers between 0 - types.
+    city = np.random.randint(1,types+1,(desired_size,desired_size))
     city = np.reshape(city, desired_size * desired_size) #Reshapes matrix into a single vector for better management.
     return (city)
 

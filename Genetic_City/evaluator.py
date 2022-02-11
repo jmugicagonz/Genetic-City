@@ -55,6 +55,7 @@ def evaluate_simplethree(evcity, look_up):
     if counts.size < 3:
         evaluation = 0
 
+    #Set minimun quantities for amenities
     elif counts[0] < 3 or counts[1] < 4 or counts[2] < 4:
         evaluation = 0
 
@@ -82,7 +83,7 @@ else:
     evaluation = 1000 - abs(counts[0]- counts[1]) - abs(counts[0]- counts[2]) - abs(counts[1]- counts[2])
 """
 
-def evaluate_cities(city_to_ev, population, look_up ): #Complete evaluation fucntion for looping through every individual of a population.
+def evaluate_cities(city_to_ev, population, look_up ): #Complete evaluation function for looping through every individual of a population.
     printProgressBar(0, population, prefix = 'Population Evaluation Progress:', suffix = 'Complete', length = 50)
     ev_vector = np.arange(population)
     for pop in range(0, population):

@@ -7,7 +7,8 @@ from progressbar import printProgressBar #Import progress bar function.
 
 def mutation(input_city, mut_prob, types): #Mutates chromosomically each individual depending on a given probability.
     for genes in range(0, input_city.shape[0]):
-        if random() < mut_prob and input_city[genes] != 0:
+        #TODO: is this != 0 necessary? -> can be removed
+        if random() < mut_prob:
             #place_variable = randint(1,9)
             input_city[genes] = randint(1,types)
     return input_city

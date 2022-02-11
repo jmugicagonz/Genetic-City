@@ -45,11 +45,11 @@ class Grid:
             od=np.multiply(od.T, 1/sum_each_row).T
         return od
 
-    def plot_grid(self, colors):
-        plt.figure(figsize=(12,12))
+    def plot_grid(self, colors, show=False):
+        plt.figure(figsize=(20,20),frameon=show)
         cell_cols=[colors[c] for c in self.grid_types]
-        X=[ind%cols for ind in range(len(self.grid_types))]
-        Y=[int(ind/cols)for ind in range(len(self.grid_types))]
+        X=[ind%self.cols for ind in range(len(self.grid_types))]
+        Y=[int(ind/self.cols)for ind in range(len(self.grid_types))]
         plt.scatter(X, Y, color=cell_cols, marker='s', s=1300)
 
 
@@ -69,15 +69,15 @@ def plot_best_found_curve(generations, best_found):
 def city_plot(input_city, block_size, grid_size ):
     size = block_size * grid_size
     plt.style.use('dark_background')
-    print(input_city.shape)
+    #print(input_city.shape)
     Z = input_city.reshape((size, size))
     x = np.arange(0, size+1, 1)  # len = 11
     y = np.arange(0, size+1, 1)  # len = 7
-    X, Y = np.meshgrid(x, y)
-    X = X + 0.2 * Y  # tilt the coordinates.
-    Y = Y + 0.3 * X
+    #TODO: eliminate is this does not affect
+    #X, Y = np.meshgrid(x, y)
     fig, ax = plt.subplots()
     for i in range(grid_size+1):
+        #We define each line to be plotted with its line's
         ax.plot(np.arange(size+1), np.repeat(i*block_size,size+1), linewidth = '5', color = 'gray')
         ax.plot(np.repeat(i*block_size,size+1), np.arange(size+1),  linewidth = '5', color = 'gray')
     ax.pcolormesh(x, y, Z, cmap='rainbow',edgecolors='k', linewidths=2)
@@ -95,23 +95,25 @@ def load_grid_data(file_loc):
         grid_list.extend([int(n.split('.')[0]) for n in line.split(',')])
     return grid_list
 
-def grid_plot():
+def grid_plot(block_size, grid_size):
     #plt.style.use('dark_background')
 
     colors=['white', 'purple', 'green', 'red']
     city_n=1
+    plot_size = block_size*grid_size
     directory = 'C:/Users/adminlocal/Documents/WorkspacesPython/Genetic-City/Genetic_City/plotting/'
 
     for files in os.listdir(directory):
         f = os.path.join(directory, files)
-        print(f)
-        print(files)
+        #print(f)
+        #print(files)
         if os.path.isfile(f) and files != '.DS_Store':
-
+            
+            #TODO: format(city_n) can be deleted?
             grid_list=load_grid_data(f.format(city_n))
 
-            grid=Grid(12, 12, grid_list)
+            grid=Grid(plot_size, plot_size, grid_list)
             grid.plot_grid(colors)
             plt.savefig('C:/Users/adminlocal/Documents/WorkspacesPython/Genetic-City/Genetic_City/images/'+str(files)+'.png')
 
-grid_plot()
+
