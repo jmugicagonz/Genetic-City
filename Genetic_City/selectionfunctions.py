@@ -10,34 +10,28 @@
 
 Functions used for selection of best individuals in algorithnm.
 
-By: Andres Rico - aricom@mit.edu
+By: Juan Mugica - jmugicag@mit.edu
 MIT Media Lab - City Science Group
                                                                                       """
 
 import numpy as np
 from progressbar import printProgressBar #Import progress bar function.
 
-def match(match_array):
-    return np.argmax(match_array)
 
-def select_cities_tournament(city_to_ev, input_city_pop, population, citysize, tournament_size):
 
-    selection_percent = tournament_size
+def select_mating_pool(fitness_vector,population, num_parents):
+    # Selecting the best individuals in the current generation as parents for producing the offspring of the next generation.
+    parents = np.empty((num_parents, population.shape[1]))
+    for parent_num in range(num_parents):
+        max_fitness_idx = np.where(fitness_vector == np.max(fitness_vector))
+        max_fitness_idx = max_fitness_idx[0][0]
+        parents[parent_num, :] = population[max_fitness_idx, :]
+        fitness_vector[max_fitness_idx] = -99999
+    return parents
 
-    printProgressBar(0, population, prefix = 'Population Selection Progress:', suffix = 'Complete', length = 50)
-    selected_population_matrix = np.zeros((population, citysize*citysize))
 
-    for tournaments in range(0, int(population / selection_percent)):
-        winner = match(city_to_ev[int(tournaments*selection_percent):int((tournaments*selection_percent)+selection_percent)])
 
-        champion_replication = []
-        for copies in range(0, int(selection_percent)):
-            champion_replication.append(input_city_pop[int((tournaments*selection_percent)+winner)])
-
-        selected_population_matrix[int(tournaments*selection_percent):int((tournaments*selection_percent)+selection_percent)] = champion_replication
-
-        printProgressBar(tournaments + 1, population, prefix = 'Population Selection Progress:', suffix = 'Complete', length = 50)
-    return selected_population_matrix
+'''
 
 
 def select_cities_rough(city_to_ev, input_city_pop, population, citysize, best_ind, best_ev):
@@ -69,3 +63,4 @@ def select_cities_rough(city_to_ev, input_city_pop, population, citysize, best_i
         selected_population_matrix[int(population*.8):int(population)] = input_city_pop[best]
 
     return selected_population_matrix
+'''

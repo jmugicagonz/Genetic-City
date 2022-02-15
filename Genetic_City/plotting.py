@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-from matplotlib.colors import BoundaryNorm
+from matplotlib.colors import BoundaryNorm, ListedColormap
 from matplotlib.ticker import MaxNLocator
 import numpy as np
 import os
@@ -66,21 +66,21 @@ def plot_best_found_curve(generations, best_found):
     return
 
 
-def city_plot(input_city, block_size, grid_size ):
+def city_plot(input_city, block_size, grid_size, colormap):
     size = block_size * grid_size
     plt.style.use('dark_background')
-    #print(input_city.shape)
     Z = input_city.reshape((size, size))
     x = np.arange(0, size+1, 1)  # len = 11
     y = np.arange(0, size+1, 1)  # len = 7
-    #TODO: eliminate is this does not affect
-    #X, Y = np.meshgrid(x, y)
     fig, ax = plt.subplots()
-    for i in range(grid_size+1):
+    '''for i in range(grid_size+1):
         #We define each line to be plotted with its line's
         ax.plot(np.arange(size+1), np.repeat(i*block_size,size+1), linewidth = '5', color = 'gray')
-        ax.plot(np.repeat(i*block_size,size+1), np.arange(size+1),  linewidth = '5', color = 'gray')
-    ax.pcolormesh(x, y, Z, cmap='rainbow',edgecolors='k', linewidths=2)
+        ax.plot(np.repeat(i*block_size,size+1), np.arange(size+1),  linewidth = '5', color = 'gray')'''
+    print("Z to show in colormesh") 
+    print(Z)
+    pc = ax.pcolormesh(x, y, Z, cmap=colormap,linewidths=2)
+    #fig.colorbar(pc, ax)
     plt.axis('off')
 
     plt.show()
@@ -116,4 +116,25 @@ def grid_plot(block_size, grid_size):
             grid.plot_grid(colors)
             plt.savefig('C:/Users/adminlocal/Documents/WorkspacesPython/Genetic-City/Genetic_City/images/'+str(files)+'.png')
 
+def fitnessAndCityPlot (best_outputs,input_city, block_size, grid_size, colormap):
+    size = block_size * grid_size
+    plt.style.use('dark_background')
+    Z = input_city.reshape((size, size))
+    x = np.arange(0, size+1, 1)  # len = 11
+    y = np.arange(0, size+1, 1)  # len = 7
+    fig, (ax1, ax2) = plt.subplots(1,2)
+    '''for i in range(grid_size+1):
+        #We define each line to be plotted with its line's
+        ax.plot(np.arange(size+1), np.repeat(i*block_size,size+1), linewidth = '5', color = 'gray')
+        ax.plot(np.repeat(i*block_size,size+1), np.arange(size+1),  linewidth = '5', color = 'gray')'''
+    print("Z to show in colormesh") 
+    print(Z)
+    pc1 = ax1.pcolormesh(x, y, Z, cmap=colormap,linewidths=2)
+    pc2 = ax2.plot(best_outputs)
+    ax2.set_xlabel("Iteration")
+    ax2.set_ylabel("Fitness")
+    #ax2.axis('off')
+    #fig.colorbar(pc, ax)
+    plt.show()
 
+    return
