@@ -31,6 +31,7 @@ from mutation_functions import *                                                
 from selectionFunctions import *                                                #Functions for best individual selection.
 from plotting import *                                                          #Functions for plotting
 from parameters import *
+from connections import *                                                       #Import functions for including roads
 
 
 #Placeholder variables
@@ -108,19 +109,22 @@ for column_blocks in range(city_size):
         print("Best solution : ", population_matrix[best_match_idx, :])
         print("Best solution fitness : ", fitness_vector[best_match_idx])
         print("Best match index: ",best_match_idx)
-
-
-        '''plt.plot(best_outputs)
-        plt.xlabel("Iteration")
-        plt.ylabel("Fitness")
-        plt.show()'''
         final_blocks[row_blocks*block_size:(row_blocks*block_size)+block_size, column_blocks*block_size:(column_blocks*block_size)+block_size] = np.reshape(population_matrix[best_match_idx[0].shape[0], :], (block_size, block_size))
-        if visualizations: np.savetxt('C:/Users/adminlocal/Documents/WorkspacesPython/Genetic-City/Genetic_City/plotting/block'+str(column_blocks)+'_'+str(row_blocks)+'gen'+str(generation)+'.txt',final_blocks,delimiter=',')
+        #if visualizations: np.savetxt('C:/Users/adminlocal/Documents/WorkspacesPython/Genetic-City/Genetic_City/plotting/block'+str(column_blocks)+'_'+str(row_blocks)+'gen'+str(generation)+'.txt',final_blocks,delimiter=',')
 
 
 
 
 print("Final blocks: ")
 print(final_blocks)
-fitnessAndCityPlot(best_outputs,final_blocks, block_size, city_size, cmap)
-if visualizations: grid_plot(block_size, city_size)
+#fitnessAndCityPlot(best_outputs,final_blocks,cmap)
+matrix_with_roads = include_roads(final_blocks)
+print("Matrix with Roads: ")
+print(matrix_with_roads)
+matrix_with_roads_amplified = matrix_for_visualization(matrix_with_roads)
+print("Matrix with Roads Amplified: ")
+print(matrix_with_roads_amplified)
+if visualizations: np.savetxt('C:/Users/adminlocal/Documents/WorkspacesPython/Genetic-City/Genetic_City/plotting/block'+'solution_amplified'+'.txt',matrix_with_roads_amplified,delimiter=',')
+grid_plot(np.shape(matrix_with_roads_amplified)[0], cmap)
+fitness_plot(best_outputs)
+#grid_plot(block_size, city_size)

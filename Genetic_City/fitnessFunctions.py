@@ -40,7 +40,7 @@ def fitness_func(solution, solution_idx):
     
     #The fitness function will return a greater value if number of parks increases. Should converge into more parks.
     unique, counts = np.unique(solution,return_index=False, return_inverse=False, return_counts=True, axis=None)
-    fitness = counts[1]
+    fitness = counts[0]
     return fitness
 
 def evaluate_blocks(block_to_ev, population_size, distance_table): #Complete evaluation function for looping through every individual of a population.
@@ -50,6 +50,23 @@ def evaluate_blocks(block_to_ev, population_size, distance_table): #Complete eva
         ev_vector[pop] = fitness_func(block_to_ev[pop,:], distance_table) #Change line to change to desired weight function.
         printProgressBar(pop + 1, population_size, prefix = 'Population Evaluation Progress:', suffix = 'Complete', length = 50)
     return ev_vector #Returns evaluation vector.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 '''
 
