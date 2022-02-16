@@ -18,6 +18,7 @@ from matplotlib.pyplot import grid
 import numpy as np
 import scipy.spatial
 from parameters import *
+from rules import *
 from progressbar import printProgressBar #Import progress bar function.
 
 
@@ -32,7 +33,7 @@ def manhattan_table(block_matrix):
     return scipy.spatial.distance_matrix(block_matrix,block_matrix,p=1)
 
 
-def fitness_func(solution, solution_idx):
+def fitness_func(solution, distance_table):
     # Calculating the fitness value of each solution in the current population.
     # The fitness function calulates the sum of products between each input and its corresponding weight.
     
@@ -40,7 +41,7 @@ def fitness_func(solution, solution_idx):
     
     #The fitness function will return a greater value if number of parks increases. Should converge into more parks.
     unique, counts = np.unique(solution,return_index=False, return_inverse=False, return_counts=True, axis=None)
-    fitness = counts[0]
+    fitness = green_space_balance_amount(counts[0],np.shape(solution)[0],percentage_of_parks)
     return fitness
 
 def evaluate_blocks(block_to_ev, population_size, distance_table): #Complete evaluation function for looping through every individual of a population.

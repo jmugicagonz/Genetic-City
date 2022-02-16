@@ -115,16 +115,15 @@ for column_blocks in range(city_size):
 
 
 
-print("Final blocks: ")
-print(final_blocks)
-#fitnessAndCityPlot(best_outputs,final_blocks,cmap)
+unique, counts = np.unique(final_blocks,return_index=False, return_inverse=False, return_counts=True, axis=None)
+print("Number of parks: ")
+print(counts[0])
+print("Number of elements: ")
+print(np.size(final_blocks))
+print("Final proportion: ")
+print(counts[0]/np.size(final_blocks))
 matrix_with_roads = include_roads(final_blocks)
-print("Matrix with Roads: ")
-print(matrix_with_roads)
 matrix_with_roads_amplified = matrix_for_visualization(matrix_with_roads)
-print("Matrix with Roads Amplified: ")
-print(matrix_with_roads_amplified)
 if visualizations: np.savetxt('C:/Users/adminlocal/Documents/WorkspacesPython/Genetic-City/Genetic_City/plotting/block'+'solution_amplified'+'.txt',matrix_with_roads_amplified,delimiter=',')
 grid_plot(np.shape(matrix_with_roads_amplified)[0], cmap)
 fitness_plot(best_outputs)
-#grid_plot(block_size, city_size)
