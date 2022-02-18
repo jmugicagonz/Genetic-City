@@ -14,6 +14,7 @@ By: Juan Mugica - jmugicag@mit.edu
 MIT Media Lab - City Science Group
                                                                                       """
 
+from tracemalloc import stop
 from matplotlib.pyplot import grid
 import numpy as np
 import scipy.spatial
@@ -41,10 +42,14 @@ def fitness_func(solution, distance_table):
     
     #The fitness function will return a greater value if number of parks increases. Should converge into more parks.
     unique, counts = np.unique(solution,return_index=False, return_inverse=False, return_counts=True, axis=None)
-    fitness = green_space_balance_amount(counts[0],np.shape(solution)[0],percentage_of_parks)
+    #COMPUTE FITNESS OF PARKS BALANCE
+    #fitness = green_space_balance_amount(counts[0],np.shape(solution)[0],percentage_of_parks)
+    fitness = int(1000*green_space_balance_width(solution,distance_table)+
+            green_space_balance_amount(counts[0],np.shape(solution)[0],percentage_of_parks))
     return fitness
 
-def evaluate_blocks(block_to_ev, population_size, distance_table): #Complete evaluation function for looping through every individual of a population.
+def evaluate_blocks(block_to_ev, distance_table): #Complete evaluation function for looping through every individual of a population.
+    population_size=block_to_ev.shape[0]
     printProgressBar(0, population_size, prefix = 'Population Evaluation Progress:', suffix = 'Complete', length = 50)
     ev_vector = np.arange(population_size)
     for pop in range(0, population_size):

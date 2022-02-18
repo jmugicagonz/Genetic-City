@@ -36,22 +36,26 @@ from connections import *                                                       
 
 #Placeholder variables
 population_matrix = np.arange(block_size * block_size) # Matrix for storing populations within process.
-#evaluation_vector = np.arange(population_size) #Evaluation vector used for selection.
 selected_matrix = np.zeros((population_size, block_size*block_size)) # Matrix for selectec populations within process.
-#crossed_population_matrix = np.zeros((population_size, block_size*block_size)) # Matrix for storing crossed populations within process.
-#mutated_population_matrix = np.zeros((population_size, block_size*block_size)) # Matrix for storing mutated populations within process.
-#best_found_ev = np.zeros(num_generations) # Matrix for storing the best found evaluation
 gen = np.arange(num_generations) + 1
-#best_found_indiv = np.zeros(block_size * block_size)
-#last_fitness = -1e10 #Saves best solution fitness value
-
 final_blocks = np.zeros((block_size*city_size,block_size*city_size )) # Matrix for storing the best blocks coming from the last iteration
-
-
+so_far_blocks = np.zeros((block_size*city_size,block_size*city_size )) # Matrix for storing the best blocks coming from some iterations and see the progress
+#Calculation of look_up distance table
 distance_table  = manhattan_table(block_matrix(block_size))
 
 #TODO: make it support multiple columns
 best_outputs = []
+
+#Variable for when to save images and plots
+generation_to_save = int(num_generations / num_generations_saved)
+
+#Creation of directories to save images and plots
+path_images_solution, path_images_fitness, path_images_gif, path_plotting = create_directory_images()
+
+#Define counter for plotting and fitness
+counter1 = 1
+counter2 = 1
+
 for column_blocks in range(city_size):
 
     for row_blocks in range(city_size):
@@ -67,43 +71,36 @@ for column_blocks in range(city_size):
         for generation in range(0, num_generations):
             print("Generation : ", generation)
 
-            fitness_vector = evaluate_blocks(population_matrix, population_size, distance_table)
-            #print("Fitness")
-            #print(fitness_vector)
-
+            fitness_vector = evaluate_blocks(population_matrix, distance_table)
+            best_match_idx = np.where(fitness_vector == np.max(fitness_vector))
             best_value = np.max(fitness_vector)
             best_outputs.append(best_value)
-            # The best result in the current iteration.
-            #print("Best result : ", best_value)
 
+            if((generation % generation_to_save)==0):
+                so_far_blocks[row_blocks*block_size:(row_blocks*block_size)+block_size, column_blocks*block_size:(column_blocks*block_size)+block_size] = np.reshape(population_matrix[best_match_idx[0].shape[0], :], (block_size, block_size))
+                matrix_with_roads = include_roads(so_far_blocks)
+                matrix_with_roads_amplified = matrix_for_visualization(matrix_with_roads)
+                saveImages(matrix_with_roads_amplified, best_outputs, cmap, generation,path_images_solution, path_images_fitness, path_plotting, num_generations, counter1, counter2)
+                counter1+=1
+                counter2+=1
 
             # Selecting the best parents in the population for mating.
             parents = select_mating_pool(fitness_vector, population_matrix, num_parents_mating)
 
-            #print("Parents")
-            #print(parents)
-
             #Cross
             offspring_crossover = crossover(parents,offspring_size=(population_size-parents.shape[0], block_size*block_size),crossover_value=crossover_value)
 
-            #print("Crossover")
-            #print(offspring_crossover)
-
-
             # Adding some variations to the offspring using mutation.
             offspring_mutation = mutation(offspring_crossover, prob_mutation, block_size, building_types)
-            #print("Mutation")
-            #print(offspring_mutation)
 
             # Creating the new population based on the parents and offspring.
             population_matrix[0:parents.shape[0], :] = parents
             population_matrix[parents.shape[0]:, :] = offspring_mutation
-            #print("Population after generation")
-            #print(population_matrix)
+
 
         # Getting the best solution after iterating finishing all generations.
         #At first, the fitness is calculated for each solution in the final generation.
-        fitness_vector = evaluate_blocks(population_matrix, population_size, distance_table) # Then return the index of that solution corresponding to the best fitness.
+        fitness_vector = evaluate_blocks(population_matrix, distance_table) # Then return the index of that solution corresponding to the best fitness.
         best_match_idx = np.where(fitness_vector == np.max(fitness_vector))
 
         print("Best solution : ", population_matrix[best_match_idx, :])
@@ -124,6 +121,18 @@ print("Final proportion: ")
 print(counts[0]/np.size(final_blocks))
 matrix_with_roads = include_roads(final_blocks)
 matrix_with_roads_amplified = matrix_for_visualization(matrix_with_roads)
-if visualizations: np.savetxt('C:/Users/adminlocal/Documents/WorkspacesPython/Genetic-City/Genetic_City/plotting/block'+'solution_amplified'+'.txt',matrix_with_roads_amplified,delimiter=',')
-grid_plot(np.shape(matrix_with_roads_amplified)[0], cmap)
-fitness_plot(best_outputs)
+#if visualizations: np.savetxt('C:/Users/adminlocal/Documents/WorkspacesPython/Genetic-City/Genetic_City/plotting/block'+'solution_amplified'+'.txt',matrix_with_roads_amplified,delimiter=',')
+#grid_plot(np.shape(matrix_with_roads_amplified)[0], cmap)
+#fitness_plot(best_outputs)
+#saveImages(matrix_with_roads_amplified, best_outputs, cmap)
+
+#Create GIF for solution and fitness
+#create_gifs(path_images_solution)
+#create_gifs(path_images_fitness)
+
+#Concatenate images and place them in the gif folfer
+get_concat_h(path_images_solution, path_images_fitness, path_images_gif)
+
+#Create GIF for concatenated images
+create_gifs(path_images_gif)
+

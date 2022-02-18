@@ -22,10 +22,10 @@ MIT Media Lab - City Science Group
 from matplotlib.colors import ListedColormap
 
 
-population_size = 100#1000 # Number of solutions in the population.
-num_parents_mating = 20#100 # Number of solutions to be selected as parents in the mating pool. Must be < population_size
-num_generations = 400#400 # Number of generations.
-prob_mutation = .3 # Must be between 0 and 1
+population_size = 1000#1000 # Number of solutions in the population.
+num_parents_mating = 50#100 # Number of solutions to be selected as parents in the mating pool. Must be < population_size
+num_generations = 500#400 # Number of generations.
+prob_mutation = .1 # Must be between 0 and 1
 #TODO: review as prop_crossover and crossover_value should tell the same thing
 #prop_crossover = .9 # The point which will define the amount of each parent constituting the offspring
 crossover_value = .9 # The point at which crossover takes place between two parents. Usually, it is at the center.
@@ -38,4 +38,12 @@ visualizations = True
 
 
 '''PARAMETERS FOR RULES'''
-percentage_of_parks = 90
+percentage_of_parks = 0.9
+
+
+'''PARAMETERS FOR PLOTS'''
+num_generations_saved = 8
+time_per_image = 500 #Time in ms for each image in the GIF
+
+#Create dictionary for images saving
+dict = {i:chr(i+96) for i in range(1,27)}
