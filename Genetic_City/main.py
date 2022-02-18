@@ -43,6 +43,9 @@ so_far_blocks = np.zeros((block_size*city_size,block_size*city_size )) # Matrix 
 #Calculation of look_up distance table
 distance_table  = manhattan_table(block_matrix(block_size))
 
+#Creation of dictionary for rules
+dictionary_rules = create_dictionary_rules()
+
 #TODO: make it support multiple columns
 best_outputs = []
 
@@ -71,7 +74,7 @@ for column_blocks in range(city_size):
         for generation in range(0, num_generations):
             print("Generation : ", generation)
 
-            fitness_vector = evaluate_blocks(population_matrix, distance_table)
+            fitness_vector = evaluate_blocks(population_matrix, distance_table, dictionary_rules)
             best_match_idx = np.where(fitness_vector == np.max(fitness_vector))
             best_value = np.max(fitness_vector)
             best_outputs.append(best_value)
@@ -100,7 +103,7 @@ for column_blocks in range(city_size):
 
         # Getting the best solution after iterating finishing all generations.
         #At first, the fitness is calculated for each solution in the final generation.
-        fitness_vector = evaluate_blocks(population_matrix, distance_table) # Then return the index of that solution corresponding to the best fitness.
+        fitness_vector = evaluate_blocks(population_matrix, distance_table,dictionary_rules) # Then return the index of that solution corresponding to the best fitness.
         best_match_idx = np.where(fitness_vector == np.max(fitness_vector))
 
         print("Best solution : ", population_matrix[best_match_idx, :])

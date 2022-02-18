@@ -34,26 +34,30 @@ def manhattan_table(block_matrix):
     return scipy.spatial.distance_matrix(block_matrix,block_matrix,p=1)
 
 
-def fitness_func(solution, distance_table):
+def fitness_func(solution, distance_table,dictionary_rules):
     # Calculating the fitness value of each solution in the current population.
     # The fitness function calulates the sum of products between each input and its corresponding weight.
-    
-    #printProgressBar(0, population, prefix = 'Population Evaluation Progress:', suffix = 'Complete', length = 50)
-    
-    #The fitness function will return a greater value if number of parks increases. Should converge into more parks.
-    unique, counts = np.unique(solution,return_index=False, return_inverse=False, return_counts=True, axis=None)
-    #COMPUTE FITNESS OF PARKS BALANCE
-    #fitness = green_space_balance_amount(counts[0],np.shape(solution)[0],percentage_of_parks)
-    fitness = int(1000*green_space_balance_width(solution,distance_table)+
-            green_space_balance_amount(counts[0],np.shape(solution)[0],percentage_of_parks))
+        
+    '''fitness = int(1000*green_space_balance_width(solution,distance_table)+
+            green_space_balance_amount())'''
+    fitness=0
+    for key in dictionary_rules:
+        fitness += weights[key]*dictionary_rules[key](solution,distance_table)
+        #fitness += dictionary_rules[key](solution,distance_table)
+        '''print("Weights are: ")
+        print(weights[key])
+        print("Dictionary rules multiplied are: ")
+        print(dictionary_rules[key](solution,distance_table))
+        print("Fitness is: ")
+        print(fitness)'''
     return fitness
 
-def evaluate_blocks(block_to_ev, distance_table): #Complete evaluation function for looping through every individual of a population.
+def evaluate_blocks(block_to_ev, distance_table,dictionary_rules): #Complete evaluation function for looping through every individual of a population.
     population_size=block_to_ev.shape[0]
     printProgressBar(0, population_size, prefix = 'Population Evaluation Progress:', suffix = 'Complete', length = 50)
     ev_vector = np.arange(population_size)
     for pop in range(0, population_size):
-        ev_vector[pop] = fitness_func(block_to_ev[pop,:], distance_table) #Change line to change to desired weight function.
+        ev_vector[pop] = fitness_func(block_to_ev[pop,:], distance_table,dictionary_rules) #Change line to change to desired weight function.
         printProgressBar(pop + 1, population_size, prefix = 'Population Evaluation Progress:', suffix = 'Complete', length = 50)
     return ev_vector #Returns evaluation vector.
 
