@@ -43,7 +43,6 @@ def fitness_func(solution, distance_table,dictionary_rules):
     fitness=0
     for key in dictionary_rules:
         fitness += weights[key]*dictionary_rules[key](solution,distance_table)
-        #fitness += dictionary_rules[key](solution,distance_table)
         '''print("Weights are: ")
         print(weights[key])
         print("Dictionary rules multiplied are: ")

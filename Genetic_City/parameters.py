@@ -40,9 +40,26 @@ visualizations = True
 
 '''PARAMETERS FOR RULES'''
 
-'''RULE1: green_space_balance_amount'''
-percentage_of_parks = 0.9
-weights = np.array([0, 0, 1, 0, 0, 0, 0, 0, 0]) #Weights used by function to evaluate. Places more interest in high numbers.
+"Weights for rules: "
+weights = np.array( #Weights used by function to evaluate. Places more interest in high numbers.
+    [0, #1: accesibility
+    0, #2: green_space_balance_amount
+    1, #3: green_space_balance_width
+    0, #4: diversity_of_housing
+    0, #5: diversity_of_office
+    0, #6: house_office_walkable
+    0, #7: access_to_parks
+    0, #8: house_office_balance
+    0]) #9: green_space
+
+"RULE1: green_space_balance_amount"
+percentage_parks = 0.9
+
+"Rule 4: Diversity of housing"
+#The next three percentages should sum 1
+percentage_small_housing = 0.2
+percentage_medium_housing = 0
+percentage_large_housing = 0.8
 
 
 
