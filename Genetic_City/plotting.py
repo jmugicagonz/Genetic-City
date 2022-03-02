@@ -141,7 +141,7 @@ def saveImages(matrix_with_roads_amplified, best_outputs, colormap, generation, 
     # js = json.dumps(output_obj, sort_keys=True,
     #                 indent=4, separators=(',', ':'))
     log_path = str(path_plotting)+'\\log\\' + \
-        dictionary_images[counter1]+'_'+str(generation)+'_generation'
+        dictionary_images[counter1]+'_'+str(generation)+'_generation.json'
     with open(log_path, "w") as f:
         json.dump(output_obj, f, sort_keys=True, separators=(',', ':'))
 
