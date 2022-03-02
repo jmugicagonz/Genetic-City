@@ -7,7 +7,10 @@ import glob
 from PIL import Image
 from parameters import *
 import string
-
+from initFunctions import *
+import matplotlib.pyplot as plt
+import pandas as pd
+from math import pi
 
 
 def load_grid_data(file_loc):
@@ -33,6 +36,7 @@ def grid_plot(plot_size, colormap, path_plotting, path_images):
             pc = ax.pcolormesh(x, y, Z, cmap=colormap,linewidths=2)
             ax.axis('off')
             plt.savefig(path_images+'/'+str(files)+'.png')
+            plt.close()
 
 def fitness_plot(best_outputs,path_images,generation,num_generations, counter2):
     fig, ax = plt.subplots()
@@ -40,7 +44,47 @@ def fitness_plot(best_outputs,path_images,generation,num_generations, counter2):
     ax.set_xlabel("Iteration")
     ax.set_ylabel("Fitness")
     plt.xlim([0, num_generations])
-    plt.savefig(path_images+'/'+dict[counter2]+'_'+str(generation)+'_generation_'+'fitnessOutputs'+'.png')
+    plt.ylim([0, 100])
+    plt.savefig(str(path_images)+'/'+dictionary_images[counter2]+'_'+str(generation)+'_generation_'+'fitnessOutputs'+'.png')
+    plt.close()
+
+#Function for plotting the Radar Chart with the different rules
+def radar_plot(path_images_radar,dictionary_rules_fitness,generation,counter3): 
+    plt.style.use('classic')
+    # number of variable
+    categories=list(['accesibility','green_space_balance_amount','green_space_balance_width','diversity_of_housing', 'diversity_of_office','house_office_walkable','access_to_parks','house_office_balance','people_fitting'])
+    N = len(categories)
+    
+    # We are going to plot the first line of the data frame.
+    # But we need to repeat the first value to close the circular graph:
+    values = list(dictionary_rules_fitness.values())
+    values.append(values[0])
+    
+    # What will be the angle of each axis in the plot? (we divide the plot / number of variable)
+    angles = [n / float(N) * 2 * pi for n in range(N)]
+    angles += angles[:1]
+    
+    # Initialise the spider plot
+    ax = plt.subplot(111, polar=True)
+    
+    # Draw one axe per variable + add labels
+    plt.xticks(angles[:-1], categories, color='grey', size=8)
+    
+    # Draw ylabels
+    ax.set_rlabel_position(0)
+    plt.yticks([10,20,30,40,50,60,70,80,90], ["10","20","30","40","50","60","70","80","90"], color="grey", size=7)
+    plt.ylim(0,100)
+    
+    # Plot data
+    ax.plot(angles, values, linewidth=1, linestyle='solid')
+    
+    # Fill area
+    ax.fill(angles, values, 'b', alpha=0.1)
+
+    # Save the graph
+    plt.savefig(str(path_images_radar)+'/'+dictionary_images[counter3]+'_'+str(generation)+'_generation_'+'radarPlot'+'.png')
+    plt.close()
+    return
 
 def fitnessAndCityPlot (best_outputs,input_city, colormap):
     size = input_city.shape[0]
@@ -65,12 +109,13 @@ def fitnessAndCityPlot (best_outputs,input_city, colormap):
 
     return
 
-def saveImages (matrix_with_roads_amplified, best_outputs, colormap, generation, path_images_solution,path_images_fitness, path_plotting, num_generations, counter1, counter2):
+def saveImages (matrix_with_roads_amplified, best_outputs, colormap, generation, path_images_solution,path_images_fitness, path_plotting, num_generations, counter1, counter2,counter3,path_images_radar,dictionary_rules_fitness):
     #Save plotting
-    np.savetxt(path_plotting+'/'+dict[counter1]+'_'+str(generation)+'_generation_'+'block_solution_amplified'+'.txt',matrix_with_roads_amplified,delimiter=',')
+    np.savetxt(str(path_plotting)+'/'+dictionary_images[counter1]+'_'+str(generation)+'_generation_'+'block_solution_amplified'+'.txt',matrix_with_roads_amplified,delimiter=',')
     #Save blocks
     grid_plot(np.shape(matrix_with_roads_amplified)[0], colormap, path_plotting, path_images_solution)
     fitness_plot(best_outputs, path_images_fitness, generation, num_generations, counter2)
+    radar_plot(path_images_radar,dictionary_rules_fitness,generation,counter3)
 
 def create_directory_images():
     time = datetime.now()
@@ -80,7 +125,7 @@ def create_directory_images():
     directory = current_day + "_" + current_time
     print("The directory where files were saved is: "+directory)
     #Define parent directory
-    parent_dir = "C:/Users/adminlocal/Documents/WorkspacesPython/Genetic-City/Genetic_City/results/"
+    parent_dir = os.path.join(path_to_code,"results")
     #Define complete path
     path = os.path.join(parent_dir, directory)
     #Create the directory
@@ -96,14 +141,17 @@ def create_directory_images():
     path_images_solution = os.path.join(path_images,"solution")
     #Define the path for fitness
     path_images_fitness = os.path.join(path_images,"fitness")
+    #Define the path for radar
+    path_images_radar = os.path.join(path_images,"radar")
     #Define the path for GIF
     path_images_GIF = os.path.join(path_images,"gif")
-    #Create the directory for solution, fitness function and GIF
+    #Create the directory for solution, fitness function, radar and GIF
     os.mkdir(path_images_solution)
     os.mkdir(path_images_fitness)
+    os.mkdir(path_images_radar)
     os.mkdir(path_images_GIF)
 
-    return path_images_solution, path_images_fitness, path_images_GIF, path_plotting
+    return path, path_images_solution, path_images_fitness, path_images_radar, path_images_GIF, path_plotting
 
 
 def create_gifs(frame_folder):
@@ -114,14 +162,18 @@ def create_gifs(frame_folder):
 
 
 #Function for concatenating images or gifs and saving them in the provided folder
-def get_concat_h(im1_path, im2_path, folder):
+def get_concat_h(im1_path, im2_path, im3_path, folder):
     frames_solution = [Image.open(image) for image in sorted(glob.glob(f"{im1_path}/*.png"))]
     frames_fitness = [Image.open(image) for image in sorted(glob.glob(f"{im2_path}/*.png"))]
+    frames_radar = [Image.open(image) for image in sorted(glob.glob(f"{im3_path}/*.png"))]
     for i in np.arange(len(frames_solution)):
         im1 = frames_solution[i]
         im2 = frames_fitness[i]
-        dst = Image.new('RGB', (im1.width + im2.width, im1.height))
+        im3 = frames_radar[i]
+        dst = Image.new('RGB', (im1.width + im2.width + im3.width, im1.height))
         dst.paste(im1, (0, 0))
         dst.paste(im2, (im1.width, 0))
+        dst.paste(im3, (im1.width+im2.width, 0))
         dst.save(folder+'/concatenated'+str(i)+'.png')
     return
+

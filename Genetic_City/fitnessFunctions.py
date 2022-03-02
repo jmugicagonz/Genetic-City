@@ -24,41 +24,41 @@ from progressbar import printProgressBar #Import progress bar function.
 
 
 
-# Matrix with the block size and where each element is equal to the tuple that gives its position
-def block_matrix(grid_size):
-    reshaped = np.reshape([[i,j] for i in range(grid_size) for j in range(grid_size)],(grid_size,grid_size,1,2))
-    return [[i,j] for i in range(grid_size) for j in range(grid_size)]
-
-# Matrix containing the manhattan distance between two indexes
-def manhattan_table(block_matrix):
-    return scipy.spatial.distance_matrix(block_matrix,block_matrix,p=1)
 
 
-def fitness_func(solution, distance_table,dictionary_rules):
+
+def fitness_func(solution, dictionary_rules):
     # Calculating the fitness value of each solution in the current population.
     # The fitness function calulates the sum of products between each input and its corresponding weight.
-        
-    '''fitness = int(1000*green_space_balance_width(solution,distance_table)+
-            green_space_balance_amount())'''
-    fitness=0
+    #Create dictionary for storing fitness functions
+    dictionary_rules_fitness = {0:0,1:0,2:0,3:0,4:0,5:0,6:0,7:0,8:0}
+    fitness=0.0
+    counterWeights = 0
+    unique, counts = np.unique(solution,return_index=False, return_inverse=False, return_counts=True, axis=None)
+    lists_of_distances = []
+    lists_of_distances = distances_homes_offices_parks(solution)
+    if (counts.size < 3): return 0 #If there are no parks, or offices, or residences, don't consider the solution.
     for key in dictionary_rules:
-        fitness += weights[key]*dictionary_rules[key](solution,distance_table)
-        '''print("Weights are: ")
-        print(weights[key])
-        print("Dictionary rules multiplied are: ")
-        print(dictionary_rules[key](solution,distance_table))
-        print("Fitness is: ")
-        print(fitness)'''
-    return fitness
+        fitness_value = dictionary_rules[key](solution,unique,counts,lists_of_distances)
+        fitness += weights[key]*fitness_value
+        dictionary_rules_fitness[key] = fitness_value
+        #We need these calculations to normalize the fitness function and put it between 0 and 100. TODO: maybe in the future it will be itneresting to make it depend on "available features and not those != 0"
+        if(weights[key] != 0): counterWeights += weights[key]
+        elif(fitness_value != 0): counterWeights += 1
+    #Then we return a fitness function between 0 and 100
+    fitness = fitness / (counterWeights)
+    return fitness, dictionary_rules_fitness
 
-def evaluate_blocks(block_to_ev, distance_table,dictionary_rules): #Complete evaluation function for looping through every individual of a population.
+def evaluate_blocks(block_to_ev, dictionary_rules): #Complete evaluation function for looping through every individual of a population.
     population_size=block_to_ev.shape[0]
     printProgressBar(0, population_size, prefix = 'Population Evaluation Progress:', suffix = 'Complete', length = 50)
-    ev_vector = np.arange(population_size)
+    ev_vector = np.zeros(population_size)
+    list_of_dictionaries_rules = []
     for pop in range(0, population_size):
-        ev_vector[pop] = fitness_func(block_to_ev[pop,:], distance_table,dictionary_rules) #Change line to change to desired weight function.
+        ev_vector[pop],dictionary_rules_fitness = fitness_func(block_to_ev[pop,:], dictionary_rules) #Change line to change to desired weight function.
+        list_of_dictionaries_rules.append(dictionary_rules_fitness)
         printProgressBar(pop + 1, population_size, prefix = 'Population Evaluation Progress:', suffix = 'Complete', length = 50)
-    return ev_vector #Returns evaluation vector.
+    return ev_vector, list_of_dictionaries_rules #Returns evaluation vector.
 
 
 

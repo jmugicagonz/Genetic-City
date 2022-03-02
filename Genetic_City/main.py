@@ -32,6 +32,8 @@ from selectionFunctions import *                                                
 from plotting import *                                                          #Functions for plotting
 from parameters import *
 from connections import *                                                       #Import functions for including roads
+from testRules import *                                                         #Import functions for testing rules
+from initFunctions import *                                                     #Import initial calculations
 
 
 #Placeholder variables
@@ -40,8 +42,6 @@ selected_matrix = np.zeros((population_size, block_size*block_size)) # Matrix fo
 gen = np.arange(num_generations) + 1
 final_blocks = np.zeros((block_size*city_size,block_size*city_size )) # Matrix for storing the best blocks coming from the last iteration
 so_far_blocks = np.zeros((block_size*city_size,block_size*city_size )) # Matrix for storing the best blocks coming from some iterations and see the progress
-#Calculation of look_up distance table
-distance_table  = manhattan_table(block_matrix(block_size))
 
 #Creation of dictionary for rules
 dictionary_rules = create_dictionary_rules()
@@ -53,11 +53,18 @@ best_outputs = []
 generation_to_save = int(num_generations / num_generations_saved)
 
 #Creation of directories to save images and plots
-path_images_solution, path_images_fitness, path_images_gif, path_plotting = create_directory_images()
+path_results, path_images_solution, path_images_fitness, path_images_radar, path_images_gif, path_plotting = create_directory_images()
 
-#Define counter for plotting and fitness
+#Save parameters in parameters.txt
+function_save_parameters(path_results)
+
+#Define counter for plotting, fitness and radar
 counter1 = 1
 counter2 = 1
+counter3 = 1
+
+#Create list to store fitness for different rules
+fitness_rules_solutions = []
 
 for column_blocks in range(city_size):
 
@@ -74,7 +81,7 @@ for column_blocks in range(city_size):
         for generation in range(0, num_generations):
             print("Generation : ", generation)
 
-            fitness_vector = evaluate_blocks(population_matrix, distance_table, dictionary_rules)
+            fitness_vector, list_of_dictionaries_rules = evaluate_blocks(population_matrix, dictionary_rules)
             best_match_idx = np.where(fitness_vector == np.max(fitness_vector))
             best_value = np.max(fitness_vector)
             best_outputs.append(best_value)
@@ -83,9 +90,10 @@ for column_blocks in range(city_size):
                 so_far_blocks[row_blocks*block_size:(row_blocks*block_size)+block_size, column_blocks*block_size:(column_blocks*block_size)+block_size] = np.reshape(population_matrix[best_match_idx[0].shape[0], :], (block_size, block_size))
                 matrix_with_roads = include_roads(so_far_blocks)
                 matrix_with_roads_amplified = matrix_for_visualization(matrix_with_roads)
-                saveImages(matrix_with_roads_amplified, best_outputs, cmap, generation,path_images_solution, path_images_fitness, path_plotting, num_generations, counter1, counter2)
+                saveImages(matrix_with_roads_amplified, best_outputs, cmap, generation,path_images_solution, path_images_fitness, path_plotting, num_generations, counter1, counter2,counter3, path_images_radar,list_of_dictionaries_rules[best_match_idx[0].shape[0]])
                 counter1+=1
                 counter2+=1
+                counter3+=1
 
             # Selecting the best parents in the population for mating.
             parents = select_mating_pool(fitness_vector, population_matrix, num_parents_mating)
@@ -103,25 +111,25 @@ for column_blocks in range(city_size):
 
         # Getting the best solution after iterating finishing all generations.
         #At first, the fitness is calculated for each solution in the final generation.
-        fitness_vector = evaluate_blocks(population_matrix, distance_table,dictionary_rules) # Then return the index of that solution corresponding to the best fitness.
+        fitness_vector, list_of_dictionaries_rules = evaluate_blocks(population_matrix, dictionary_rules) # Then return the index of that solution corresponding to the best fitness.
         best_match_idx = np.where(fitness_vector == np.max(fitness_vector))
 
-        print("Best solution : ", population_matrix[best_match_idx, :])
-        print("Best solution fitness : ", fitness_vector[best_match_idx])
-        print("Best match index: ",best_match_idx)
-        final_blocks[row_blocks*block_size:(row_blocks*block_size)+block_size, column_blocks*block_size:(column_blocks*block_size)+block_size] = np.reshape(population_matrix[best_match_idx[0].shape[0], :], (block_size, block_size))
+        print("Best solution : ", population_matrix[best_match_idx[0][0], :])
+        print("Best solution fitness : ", fitness_vector[best_match_idx[0][0]])
+        print("Fitness vector: ",fitness_vector)
+        final_blocks[row_blocks*block_size:(row_blocks*block_size)+block_size, column_blocks*block_size:(column_blocks*block_size)+block_size] = np.reshape(population_matrix[best_match_idx[0][0], :], (block_size, block_size))
         #if visualizations: np.savetxt('C:/Users/adminlocal/Documents/WorkspacesPython/Genetic-City/Genetic_City/plotting/block'+str(column_blocks)+'_'+str(row_blocks)+'gen'+str(generation)+'.txt',final_blocks,delimiter=',')
 
 
 
 
-unique, counts = np.unique(final_blocks,return_index=False, return_inverse=False, return_counts=True, axis=None)
+'''unique, counts = np.unique(final_blocks,return_index=False, return_inverse=False, return_counts=True, axis=None)
 print("Number of parks: ")
 print(counts[0])
 print("Number of elements: ")
 print(np.size(final_blocks))
 print("Final proportion: ")
-print(counts[0]/np.size(final_blocks))
+print(counts[0]/np.size(final_blocks))'''
 matrix_with_roads = include_roads(final_blocks)
 matrix_with_roads_amplified = matrix_for_visualization(matrix_with_roads)
 #if visualizations: np.savetxt('C:/Users/adminlocal/Documents/WorkspacesPython/Genetic-City/Genetic_City/plotting/block'+'solution_amplified'+'.txt',matrix_with_roads_amplified,delimiter=',')
@@ -134,8 +142,15 @@ matrix_with_roads_amplified = matrix_for_visualization(matrix_with_roads)
 #create_gifs(path_images_fitness)
 
 #Concatenate images and place them in the gif folfer
-get_concat_h(path_images_solution, path_images_fitness, path_images_gif)
+get_concat_h(path_images_solution, path_images_fitness, path_images_radar, path_images_gif)
 
 #Create GIF for concatenated images
 create_gifs(path_images_gif)
+
+'''TEST RULES'''
+print("Final blocks are: ")
+print(final_blocks)
+print("Best match index: ",best_match_idx[0][0])
+test_diversity_of_housing(final_blocks.reshape(block_size*block_size),distance_table)
+test_green_space_balance_width(final_blocks.reshape(block_size*block_size),distance_table)
 
