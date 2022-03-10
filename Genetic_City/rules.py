@@ -52,8 +52,10 @@ def green_space_balance_width(solution,unique,counts,lists_of_distances):
     edge_rows_and_columns = 4*(ideal_park_size-2)*pow(5,2)
     inside = (ideal_park_size*ideal_park_size-4*ideal_park_size)*pow(8,2)
     max_green_space_balance_width = corners+edge_rows_and_columns+inside
-    coef_green_space_balance_width = 1/max_green_space_balance_width*100
-    return coef_green_space_balance_width*fitness
+    coef_green_space_balance_width = 2/max_green_space_balance_width*100
+    fitness = coef_green_space_balance_width*fitness
+    if (fitness>=100): return 100
+    return fitness
 
 "4"    
 def diversity_of_housing(solution,unique,counts,lists_of_distances):

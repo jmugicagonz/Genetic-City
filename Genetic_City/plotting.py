@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+
+
 import matplotlib.pyplot as plt
 import numpy as np
 import os
@@ -52,7 +55,7 @@ def fitness_plot(best_outputs,path_images,generation,num_generations, counter2):
 def radar_plot(path_images_radar,dictionary_rules_fitness,generation,counter3): 
     plt.style.use('classic')
     # number of variable
-    categories=list(['accesibility','green_space_balance_amount','green_space_balance_width','diversity_of_housing', 'diversity_of_office','house_office_walkable','access_to_parks','house_office_balance','people_fitting'])
+    categories=list(['accesibility','Green space amount','Green space width','Housing diversity', 'Office diversity','Walkable house-office','Parks access','house office balance','people_fitting'])
     N = len(categories)
     
     # We are going to plot the first line of the data frame.
@@ -65,21 +68,45 @@ def radar_plot(path_images_radar,dictionary_rules_fitness,generation,counter3):
     angles += angles[:1]
     
     # Initialise the spider plot
-    ax = plt.subplot(111, polar=True)
+    ax = plt.subplot(111, polar=True, facecolor='k')
+    plt.style.use('dark_background')
     
     # Draw one axe per variable + add labels
-    plt.xticks(angles[:-1], categories, color='grey', size=8)
+    plt.xticks(angles[:-1], categories, size=8)
     
     # Draw ylabels
     ax.set_rlabel_position(0)
-    plt.yticks([10,20,30,40,50,60,70,80,90], ["10","20","30","40","50","60","70","80","90"], color="grey", size=7)
+    plt.yticks([10,20,30,40,50,60,70,80,90], ["10","20","30","40","50","60","70","80","90"], size=7)
     plt.ylim(0,100)
+
+    #Change the color of the tick labels
+    ax.tick_params(colors='#ffffff')
     
+    # Change the color of the circular gridlines.
+    ax.grid(color='#ffffff')
+
+    # Change the color of the outermost gridline (the spine).
+    ax.spines['polar'].set_color('#ffffff')
+
     # Plot data
-    ax.plot(angles, values, linewidth=1, linestyle='solid')
+    ax.plot(angles, values, linewidth=1, linestyle='solid', color='w')
     
     # Fill area
     ax.fill(angles, values, 'b', alpha=0.1)
+
+    # Fix axis to go in the right order and start at 12 o'clock.
+    ax.set_theta_offset(np.pi / 2)
+    ax.set_theta_direction(-1)
+
+    # Go through labels and adjust alignment based on where
+    # it is in the circle.
+    for label, angle in zip(ax.get_xticklabels(), angles):
+        if angle in (0, np.pi):
+            label.set_horizontalalignment('center')
+        elif 0 < angle < np.pi:
+            label.set_horizontalalignment('left')
+        else:
+            label.set_horizontalalignment('right')
 
     # Save the graph
     plt.savefig(str(path_images_radar)+'/'+dictionary_images[counter3]+'_'+str(generation)+'_generation_'+'radarPlot'+'.png')
