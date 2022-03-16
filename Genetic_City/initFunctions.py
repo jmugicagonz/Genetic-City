@@ -26,7 +26,7 @@ distance_table  = manhattan_table(block_matrix(block_size))
 distance_table_roads  = manhattan_table(block_matrix((block_size)*2-1))
 
 #Create dictionary for images saving
-dictionary_images = {i:chr(i+96) for i in range(1,27)}
+dictionary_images = {i:(str(chr((i//10)+97))+str(i%10)) for i in range(1,200)}
 
 #Normal distributions for housing
 nd_small_house = scipy.stats.norm(percentage_small_housing, 0.2)

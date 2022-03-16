@@ -53,15 +53,16 @@ best_outputs = []
 generation_to_save = int(num_generations / num_generations_saved)
 
 #Creation of directories to save images and plots
-path_results, path_images_solution, path_images_fitness, path_images_radar, path_images_gif, path_plotting = create_directory_images()
+path_results, path_images_solution, path_images_fitness, path_images_radar, path_images_gif, path_plotting, path_images_matrix = create_directory_images()
 
 #Save parameters in parameters.txt
 function_save_parameters(path_results)
 
-#Define counter for plotting, fitness and radar
+#Define counter for plotting, fitness, radar and matrix
 counter1 = 1
 counter2 = 1
 counter3 = 1
+counter4 = 1
 
 #Create list to store fitness for different rules
 fitness_rules_solutions = []
@@ -90,7 +91,8 @@ for column_blocks in range(city_size):
                 so_far_blocks[row_blocks*block_size:(row_blocks*block_size)+block_size, column_blocks*block_size:(column_blocks*block_size)+block_size] = np.reshape(population_matrix[best_match_idx[0].shape[0], :], (block_size, block_size))
                 matrix_with_roads = include_roads(so_far_blocks)
                 matrix_with_roads_amplified = matrix_for_visualization(matrix_with_roads)
-                saveImages(matrix_with_roads_amplified, best_outputs, cmap, generation,path_images_solution, path_images_fitness, path_plotting, num_generations, counter1, counter2,counter3, path_images_radar,list_of_dictionaries_rules[best_match_idx[0].shape[0]])
+                #saveImages(so_far_blocks,matrix_with_roads_amplified, best_outputs, cmap, generation,path_images_solution, path_images_fitness, path_images_matrix, path_plotting, num_generations, counter1, counter2,counter3, counter4, path_images_radar,list_of_dictionaries_rules[best_match_idx[0].shape[0]])
+                saveImages(so_far_blocks,so_far_blocks, best_outputs, cmap, generation,path_images_solution, path_images_fitness, path_images_matrix, path_plotting, num_generations, counter1, counter2,counter3, counter4, path_images_radar,list_of_dictionaries_rules[best_match_idx[0].shape[0]])
                 counter1+=1
                 counter2+=1
                 counter3+=1

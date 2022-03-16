@@ -2,6 +2,8 @@
 
 
 import matplotlib.pyplot as plt
+import matplotlib
+import imageio
 import numpy as np
 import os
 from datetime import datetime
@@ -11,11 +13,11 @@ from PIL import Image
 from parameters import *
 import string
 from initFunctions import *
-import matplotlib.pyplot as plt
 import pandas as pd
 from math import pi
 import json
 
+matplotlib.use('agg')
 
 def load_grid_data(file_loc):
     with open(file_loc) as f:
@@ -41,7 +43,8 @@ def grid_plot(plot_size, colormap, path_plotting, path_images):
             pc = ax.pcolormesh(x, y, Z, cmap=colormap, linewidths=2)
             ax.axis('off')
             plt.savefig(path_images+'/'+str(files)+'.png')
-            plt.close()
+            fig.clear()
+            plt.close('all')
 
 
 def fitness_plot(best_outputs, path_images, generation, num_generations, counter2):
@@ -53,14 +56,16 @@ def fitness_plot(best_outputs, path_images, generation, num_generations, counter
     ax.set_ylabel("Fitness")
     plt.xlim([0, num_generations])
     plt.ylim([0, 100])
-    plt.savefig(str(path_images)+'/'+dictionary_images[counter2]+'_'+str(
+    plt.savefig(str(path_images)+'/'+str(dictionary_images[counter2])+'_'+str(
         generation)+'_generation_'+'fitnessOutputs'+'.png')
-    plt.close()
+    fig.clear()
+    plt.close('all')
 
 # Function for plotting the Radar Chart with the different rules
 
 
 def radar_plot(path_images_radar, dictionary_rules_fitness, generation, counter3):
+    fig, ax = plt.subplots()
     plt.style.use('classic')
     # import ipdb
     # ipdb.set_trace()
@@ -121,9 +126,10 @@ def radar_plot(path_images_radar, dictionary_rules_fitness, generation, counter3
             label.set_horizontalalignment('right')
 
     # Save the graph
-    plt.savefig(str(path_images_radar)+'/'+dictionary_images[counter3]+'_'+str(
+    plt.savefig(str(path_images_radar)+'/'+str(dictionary_images[counter3])+'_'+str(
         generation)+'_generation_'+'radarPlot'+'.png')
-    plt.close()
+    fig.clear()
+    plt.close('all')
     return
 
 
@@ -150,10 +156,14 @@ def fitnessAndCityPlot(best_outputs, input_city, colormap):
 
     return
 
+""" def matrix_plot(path_images_matrix, so_far_blocks, generation, counter4):
+    imageio.imwrite(str(path_images_matrix)+'/'+dictionary_images[counter4]+'_'+str(
+        generation)+'_generation_'+'matrix'+'.jpeg',np.reshape(so_far_blocks,(block_size,block_size))) """
 
-def saveImages(matrix_with_roads_amplified, best_outputs, colormap, generation, path_images_solution, path_images_fitness, path_plotting, num_generations, counter1, counter2, counter3, path_images_radar, dictionary_rules_fitness):
+
+def saveImages(so_far_blocks, matrix_with_roads_amplified, best_outputs, colormap, generation, path_images_solution, path_images_fitness, path_images_matrix, path_plotting, num_generations, counter1, counter2, counter3, counter4, path_images_radar, dictionary_rules_fitness):
     # Save plotting
-    np.savetxt(str(path_plotting)+'\\'+dictionary_images[counter1]+'_'+str(
+    np.savetxt(str(path_plotting)+'\\'+str(dictionary_images[counter1])+'_'+str(
         generation)+'_generation_'+'block_solution_amplified'+'.txt', matrix_with_roads_amplified, delimiter=',')
     # Save blocks
     grid_plot(np.shape(matrix_with_roads_amplified)[
@@ -162,13 +172,15 @@ def saveImages(matrix_with_roads_amplified, best_outputs, colormap, generation, 
                  generation, num_generations, counter2)
     radar_plot(path_images_radar, dictionary_rules_fitness,
                generation, counter3)
+    # matrix_plot(path_images_matrix, so_far_blocks,
+    #            generation, counter4)
     # ipdb.set_trace()
     output_obj = {'block': matrix_with_roads_amplified.tolist(),
                   'fitness': best_outputs, 'radar': dictionary_rules_fitness}
     # js = json.dumps(output_obj, sort_keys=True,
     #                 indent=4, separators=(',', ':'))
     log_path = str(path_plotting)+'\\log\\' + \
-        dictionary_images[counter1]+'_'+str(generation)+'_generation.json'
+        str(dictionary_images[counter1])+'_'+str(generation)+'_generation.json'
     with open(log_path, "w") as f:
         json.dump(output_obj, f, sort_keys=True, separators=(',', ':'))
 
@@ -191,6 +203,7 @@ def create_directory_images():
     path_images = os.path.join(path, "images")
     # Define plotting path
     path_plotting = os.path.join(path, "plotting")
+    #Define log path
     path_log = os.path.join(path_plotting, "log")
     # Create directories for images and plotting
     os.mkdir(path_images)
@@ -202,6 +215,8 @@ def create_directory_images():
     path_images_fitness = os.path.join(path_images, "fitness")
     # Define the path for radar
     path_images_radar = os.path.join(path_images, "radar")
+    #Define the path for matrix
+    path_images_matrix = os.path.join(path_images, "matrix")
     # Define the path for GIF
     path_images_GIF = os.path.join(path_images, "gif")
     # Create the directory for solution, fitness function, radar and GIF
@@ -209,8 +224,9 @@ def create_directory_images():
     os.mkdir(path_images_fitness)
     os.mkdir(path_images_radar)
     os.mkdir(path_images_GIF)
+    os.mkdir(path_images_matrix)
 
-    return path, path_images_solution, path_images_fitness, path_images_radar, path_images_GIF, path_plotting
+    return path, path_images_solution, path_images_fitness, path_images_radar, path_images_GIF, path_plotting, path_images_matrix
 
 
 def create_gifs(frame_folder):

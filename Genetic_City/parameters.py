@@ -22,7 +22,7 @@ crossover_value = .9 # The point at which crossover takes place between two pare
 block_size = 15 # Size of the area to optimise (square dimension)
 city_size = 1 #Amount of adjancent blocks to optimise in parallel (square dimension) JUST WORKS WITH grid_size == 1
 building_types = 3 # [1 = Park, 2 = Office, 3 = Residential, 4 = Road]
-cmap = ListedColormap(["green","blue","orange","grey"])
+cmap = ListedColormap(["forestgreen","lightcoral","lightgray","dimgray"])
 #cmap = ListedColormap(["green","blue","orange"])
 visualizations = True
 path_to_code = "C:/Users/adminlocal/Documents/WorkspacesPython/Genetic-City/Genetic_City"
@@ -34,16 +34,16 @@ path_to_code = "C:/Users/adminlocal/Documents/WorkspacesPython/Genetic-City/Gene
 weights = np.array( #Weights used by function to evaluate. Places more interest in high numbers.
     [1, #1: accesibility NOT AVAILABLE
     1, #2: green_space_balance_amount 
-    100, #3: green_space_balance_width
-    5, #4: diversity_of_housing
-    5, #5: diversity_of_office NOT TESTED
+    60, #3: green_space_balance_width
+    30, #4: diversity_of_housing
+    30, #5: diversity_of_office NOT TESTED
     1, #6: house_office_walkable
     1, #7: access_to_parks
     1, #8: house_office_balance NA
     1, ]) #9: people_fitting NOT TESTED
 
 '''PARAMETERS FOR PLOTS'''
-num_generations_saved = 10 # >=1
+num_generations_saved = 20 # >=1
 time_per_image = 500 #Time in ms for each image in the GIF
 
 '''GENERAL PARAMETERS FOR FUNCTIONS'''

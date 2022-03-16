@@ -87,6 +87,8 @@ def diversity_of_housing(solution,unique,counts,lists_of_distances):
     percentage_medium = counter_medium/len(houses)
     percentage_small = 1 - (percentage_large+percentage_medium)
     fitness = nd_small_house.pdf(percentage_small)+nd_medium_house.pdf(percentage_medium)+nd_large_house.pdf(percentage_large)
+    fitness *=1.5
+    if(fitness>=100): return 100
     return coef_diversity_of_housing*fitness
 
 "5"
@@ -119,6 +121,8 @@ def diversity_of_office(solution,unique,counts,lists_of_distances):
     percentage_medium = counter_medium/len(offices)
     percentage_small = 1 - (percentage_large+percentage_medium)
     fitness = nd_small_office.pdf(percentage_small)+nd_medium_office.pdf(percentage_medium)+nd_large_office.pdf(percentage_large)
+    fitness *= 1.5
+    if(fitness>=100): return 100
     return coef_diversity_of_housing*fitness
 
 "6"
