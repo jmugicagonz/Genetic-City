@@ -10,7 +10,7 @@
 
 Genetic algorithm for city design main algorithm code.
 
-By: Andres Rico - aricom@mit.edu
+By: Juan Mugica - jmugicag@mit.edu
 Visitng Student MIT Media Lab - City Science Group
 ```                                                                                     
 
