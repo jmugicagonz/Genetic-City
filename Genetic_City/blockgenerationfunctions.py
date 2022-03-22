@@ -20,7 +20,6 @@ from random import *
 
 #Function creates a random city design by assigning a specific number to each block.
 #Number key is based on the block representation used on the Bento Scope.
-#TODO: This function should be rethought as evey number between 0->1.49 will go to 1, being the result not an uniform distribution. -> CHANGE
 def blockgen(desired_size, types):
     block = np.random.randint(1,types+1,(desired_size,desired_size))
     block = np.reshape(block, desired_size * desired_size) #Reshapes matrix into a single vector for better management.

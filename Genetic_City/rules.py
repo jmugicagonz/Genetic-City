@@ -150,37 +150,12 @@ def house_office_balance(solution,unique,counts,lists_of_distances):
     else: fitness=nb_people_working/nb_people_living*100
     return fitness
 
-"10"
+"9"
 def people_fitting(solution, unique, counts,lists_of_distances):
     if (len(np.where(solution == 3)[0])<min_num_people_to_fit/residence_density): return 0 #This solution can't fit the number of people needed
     return 100
 
-'''"11"
-def adjacent_roads(solution, unique, counts,lists_of_distances):
-    #We initialize the fitness function to 0
-    fitness = 0
-    #First we include roads in the matrix
-    matrix_with_roads = include_roads(np.reshape(solution,(block_size, block_size)))
-    array_with_roads = np.reshape(matrix_with_roads,len(matrix_with_roads[0])*len(matrix_with_roads[1]))
-    #First we find in the solution which indexes correspond to roads
-    roads = np.where(array_with_roads == 4)[0]
-    if len(roads)>0:
-        #From those indexes which are houses, which of them are adjacent?
-        man_tups = [sorted(sub) for sub in product(roads, repeat = 2)
-                                                if distance_table_roads[sub[0],sub[1]] == 1]
-        #We create a dictionary with those chains of adjacent points
-        res_dict = {ele: {ele} for ele in roads}
-        for tup1, tup2 in man_tups:
-            res_dict[tup1] |= res_dict[tup2]
-            res_dict[tup2] = res_dict[tup1]
-        #Creation of arrays containing those adjacent chains. We take the unique values from the dictionary.
-        res = [[*next(val)] for key, val in groupby(
-                sorted(res_dict.values(), key = id), id)]
-    fitness = nd_roads.pdf(len(res))
-    return coef_adjacent_roads*fitness'''
-
-
-
+"10"
 def distances_homes_offices_parks(solution):
     parks = np.where(solution == 1)
     offices = np.where(solution == 2)
@@ -220,39 +195,11 @@ def distances_homes_offices_parks(solution):
         distances_offices_to_parks[office]=min_distance_to_park
     return distances_homes_to_offices, distances_homes_to_parks, distances_offices_to_homes, distances_offices_to_parks
 
+
+#Creation of the dictionary for rules
 def create_dictionary_rules():
     dictionary_rules = {0:accesibility,1:green_space_balance_amount,2:green_space_balance_width,3:diversity_of_housing,4:diversity_of_office,5:house_office_walkable,6:access_to_parks,7:house_office_balance,8:people_fitting}
     return dictionary_rules
-'''OLD TOP-DOWN SOLUTION. IT TAKES TOO MUCH TIME TO COMPUTE'''
-'''def green_space_balance_width(solution,distance_table):
-    #First we find in the solution which indexes correspond to parks
-    parks = np.where(solution == 1)[0]
-    #We initialize the fitness function to 0
-    fitness = 0
-    if len(parks)>0:
-        #From those indexes which are parks, which of them are adjacent?
-        man_tups = [sorted(sub) for sub in product(parks, repeat = 2)
-                                                if distance_table[sub[0],sub[1]] == 1]
-        #We create a dictionary with those chains of adjacent points
-        res_dict = {ele: {ele} for ele in parks}
-        for tup1, tup2 in man_tups:
-            res_dict[tup1] |= res_dict[tup2]
-            res_dict[tup2] = res_dict[tup1]
-        #Creation of arrays containing those adjacent chains. We take the unique values from the dictionary.
-        res = [[*next(val)] for key, val in groupby(
-                sorted(res_dict.values(), key = id), id)]
-        distances = 0
-        total=0
-        for i in range(int(len(res))):
-            #To increase the size of parks, we will give more fitness to those parks which are areas instead of lines. For that, we compute distances between those nodes making part of the park.
-            fitness += np.sum(10*len(res[i]))
-            #man_tups now will be tuples of nodes from the same park
-            man_tups = [sorted(sub) for sub in product(res[i], repeat = 2) if distance_table[sub[0],sub[1]] >= 1]
-            for j in man_tups:
-                if len(j)>1:
-                    distances+=distance_table[j[0],j[1]]
-                    total+=1
-        if total>0 : 
-            distances/=total
-            fitness += 100/distances
-    return fitness'''
+
+#Creation of dictionary for rules
+dictionary_rules = create_dictionary_rules()

@@ -140,26 +140,13 @@ def fitnessAndCityPlot(best_outputs, input_city, colormap):
     x = np.arange(0, size+1, 1)  # len = 11
     y = np.arange(0, size+1, 1)  # len = 7
     fig, (ax1, ax2) = plt.subplots(1, 2)
-    '''for i in range(grid_size+1):
-        #We define each line to be plotted with its line's
-        ax.plot(np.arange(size+1), np.repeat(i*block_size,size+1), linewidth = '5', color = 'gray')
-        ax.plot(np.repeat(i*block_size,size+1), np.arange(size+1),  linewidth = '5', color = 'gray')'''
-    #print("Z to show in colormesh")
-    # print(Z)
     pc1 = ax1.pcolormesh(x, y, Z, cmap=colormap, linewidths=2)
     pc2 = ax2.plot(best_outputs)
     ax2.set_xlabel("Iteration")
     ax2.set_ylabel("Fitness")
-    # ax2.axis('off')
-    #fig.colorbar(pc, ax)
     plt.show()
 
     return
-
-""" def matrix_plot(path_images_matrix, so_far_blocks, generation, counter4):
-    imageio.imwrite(str(path_images_matrix)+'/'+dictionary_images[counter4]+'_'+str(
-        generation)+'_generation_'+'matrix'+'.jpeg',np.reshape(so_far_blocks,(block_size,block_size))) """
-
 
 def saveImages(so_far_blocks, matrix_with_roads_amplified, best_outputs, colormap, generation, path_images_solution, path_images_fitness, path_images_matrix, path_plotting, num_generations, counter1, counter2, counter3, counter4, path_images_radar, dictionary_rules_fitness):
     # Save plotting
@@ -172,13 +159,8 @@ def saveImages(so_far_blocks, matrix_with_roads_amplified, best_outputs, colorma
                  generation, num_generations, counter2)
     radar_plot(path_images_radar, dictionary_rules_fitness,
                generation, counter3)
-    # matrix_plot(path_images_matrix, so_far_blocks,
-    #            generation, counter4)
-    # ipdb.set_trace()
     output_obj = {'block': matrix_with_roads_amplified.tolist(),
                   'fitness': best_outputs, 'radar': dictionary_rules_fitness}
-    # js = json.dumps(output_obj, sort_keys=True,
-    #                 indent=4, separators=(',', ':'))
     log_path = str(path_plotting)+'\\log\\' + \
         str(dictionary_images[counter1])+'_'+str(generation)+'_generation.json'
     with open(log_path, "w") as f:

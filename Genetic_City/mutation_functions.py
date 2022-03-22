@@ -2,8 +2,6 @@ import numpy as np
 from random import *
 from progressbar import printProgressBar #Import progress bar function.
 
-
-
 def mutate_individual(input_city, mut_prob, types): #Mutates chromosomically each individual depending on a given probability.
     for genes in range(0, input_city.shape[0]):
         #TODO: is this != 0 necessary? -> can be removed
