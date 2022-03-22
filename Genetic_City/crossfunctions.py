@@ -17,29 +17,19 @@ from random import *
 from progressbar import printProgressBar #Import progress bar function.
 import numpy as np
 
+# Ring structure for crossover. 1&2, then 2&3, etc. When no more parents, it starts again with parent 1.
+def crossover(parents, offspring_size, crossover_value):
+    offspring = np.empty(offspring_size)
+    # The point at which crossover takes place between two parents. Usually, it is at the center.
+    crossover_point = np.uint8(offspring_size[1]*crossover_value)
 
-def cross(parent1, parent2, probability ): #Function takes two parents as inputs and crosses them depending on a certain probability of cross.
-    fullarray = np.zeros((2, parent1.shape[0]))
-    fullarray[0,:] = parent1
-    fullarray[1,:] = parent2
-
-    for inc in range (0, parent1.shape[0]): #Chooses section of individuals to "cut" for cross.
-        #TODO: review as making an average is an error here
-        if random() < probability:
-            fullarray[0][inc] = round((parent2[inc]+parent1[inc])/2)
-            fullarray[1][inc] = round((parent2[inc]+parent1[inc])/2)
-
-        return fullarray
-
-def cross_individuals(input_city_pop, crossprob, population, citysize): #Complete cross function for an entire population.
-    printProgressBar(0, population, prefix = 'Population Cross Progress:', suffix = 'Complete', length = 50)
-    for i in range(0,50):
-        np.random.shuffle(input_city_pop)
-
-    crossed_population = np.zeros((population, citysize*citysize))
-    for crosses in range(0,population,2):
-        newchildren = cross(input_city_pop[crosses, :], input_city_pop[crosses + 1, :], crossprob)
-        crossed_population[crosses,:] = newchildren[0,:]
-        crossed_population[crosses + 1,:] = newchildren[1,:]
-        printProgressBar(crosses + 2, population, prefix = 'Population Cross Progress:', suffix = 'Complete', length = 50)
-    return crossed_population
+    for k in range(offspring_size[0]):
+        # Index of the first parent to mate.
+        parent1_idx = k%parents.shape[0]
+        # Index of the second parent to mate.
+        parent2_idx = (k+1)%parents.shape[0]
+        # The new offspring will have its first half of its genes taken from the first parent.
+        offspring[k, 0:crossover_point] = parents[parent1_idx, 0:crossover_point]
+        # The new offspring will have its second half of its genes taken from the second parent.
+        offspring[k, crossover_point:] = parents[parent2_idx, crossover_point:]
+    return offspring

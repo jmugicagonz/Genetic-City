@@ -10,34 +10,91 @@
 
 Functions used for evaluation of city populations for algorithm.
 
-By: Andres Rico - aricom@mit.edu
+By: Juan Mugica - jmugicag@mit.edu
 MIT Media Lab - City Science Group
                                                                                       """
 
-mutation_prob = .9 #Must be between 0 - 1
+from tracemalloc import stop
+from matplotlib.pyplot import grid
 import numpy as np
+import scipy.spatial
+from parameters import *
+from rules import *
 from progressbar import printProgressBar #Import progress bar function.
+import time
+import ray
 
-def look_up_table(grid_size):
-    source_i_2d=[[i]*grid_size for i in range(grid_size)]
-    source_i=[j for sub in source_i_2d for j in sub]
-    source_j=list(range(grid_size))*grid_size
 
-    manhattan_distmat=np.array([[np.abs(source_i[ind]-i)+np.abs(source_j[ind]-j) for i in range(grid_size) for j in range(grid_size)] for ind in range(len(source_i))])
 
-    return manhattan_distmat
 
-#Function takes as input a vector with a city design and evaluates it according to the weight vector set on objevtive fucntion.
-def evaluate_park(evcity):
-    total_evaluation = 0
-    wheights = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9]) #Weights used by function to evaluate. Places more interest in high numbers.
-    unique, counts = np.unique(evcity,return_index=False, return_inverse=False, return_counts=True, axis=None)
-    dictionary = dict(zip(unique, counts))
-    for type in range(1,10):
-        #print(dictionary[1])
-        if type in evcity:
-            total_evaluation = total_evaluation + (dictionary[type] * wheights[type - 1]) #Objective fucntion. This function will change as real city metrics are added to algorithm.
-    return total_evaluation #This function should try to give an output of a matrix containing all nines or close to all nines.
+
+# Ray task
+@ray.remote
+def fitness_func(solution, dictionary_rules):
+    # Calculating the fitness value of each solution in the current population.
+    # The fitness function calulates the sum of products between each input and its corresponding weight.
+    #Create dictionary for storing fitness functions
+    dictionary_rules_fitness = {0:0,1:0,2:0,3:0,4:0,5:0,6:0,7:0,8:0}
+    fitness=0.0
+    counterWeights = 0
+    unique, counts = np.unique(solution,return_index=False, return_inverse=False, return_counts=True, axis=None)
+    lists_of_distances = []
+    lists_of_distances = distances_homes_offices_parks(solution)
+    if (counts.size < 3): return 0 #If there are no parks, or offices, or residences, don't consider the solution.
+    for key in dictionary_rules:
+        fitness_value = dictionary_rules[key](solution,unique,counts,lists_of_distances)
+        fitness += weights[key]*fitness_value
+        dictionary_rules_fitness[key] = fitness_value
+        #We need these calculations to normalize the fitness function and put it between 0 and 100. TODO: maybe in the future it will be itneresting to make it depend on "available features and not those != 0"
+        if(weights[key] != 0): counterWeights += weights[key]
+        elif(fitness_value != 0): counterWeights += 1
+    #Then we return a fitness function between 0 and 100
+    fitness = fitness / (counterWeights)
+    return fitness, dictionary_rules_fitness
+
+'''def evaluate_blocks(block_to_ev, dictionary_rules): #Complete evaluation function for looping through every individual of a population.
+    population_size=block_to_ev.shape[0]
+    printProgressBar(0, population_size, prefix = 'Population Evaluation Progress:', suffix = 'Complete', length = 50)
+    ev_vector = np.zeros(population_size)
+    list_of_dictionaries_rules = []
+    start_time = time.time()
+    for pop in range(0, population_size):
+        ev_vector[pop],dictionary_rules_fitness = fitness_func(block_to_ev[pop,:], dictionary_rules) #Change line to change to desired weight function.
+        list_of_dictionaries_rules.append(dictionary_rules_fitness)
+        printProgressBar(pop + 1, population_size, prefix = 'Population Evaluation Progress:', suffix = 'Complete', length = 50)
+    duration = time.time() - start_time
+    print("Duration of evaluation: {}".format(duration))
+    return ev_vector, list_of_dictionaries_rules #Returns evaluation vector.'''
+
+def evaluate_blocks(block_to_ev, dictionary_rules): #Complete evaluation function for looping through every individual of a population.
+    population_size=block_to_ev.shape[0]
+    #printProgressBar(0, population_size, prefix = 'Population Evaluation Progress:', suffix = 'Complete', length = 50)
+    ev_vector = np.zeros(population_size)
+    list_of_dictionaries_rules = []*population_size
+    ray_object = ray.get([fitness_func.remote(block_to_ev[pop,:], dictionary_rules) for pop in range(population_size)])
+    ev_vector = [i[0] for i in ray_object]
+    list_of_dictionaries_rules = [i[1] for i in ray_object]
+    printProgressBar(population_size, population_size, prefix = 'Population Evaluation Progress:', suffix = 'Complete', length = 50)
+    return ev_vector, list_of_dictionaries_rules #Returns evaluation vector.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+'''
+
 
 def evaluate_balanced(evcity):
     total_evaluation = 0
@@ -90,3 +147,4 @@ def evaluate_cities(city_to_ev, population, look_up ): #Complete evaluation func
         ev_vector[pop] = evaluate_simplethree(city_to_ev[pop,:], look_up) #Change line to change to desired weight function.
         printProgressBar(pop + 1, population, prefix = 'Population Evaluation Progress:', suffix = 'Complete', length = 50)
     return ev_vector #Returns evaluation vector.
+'''
