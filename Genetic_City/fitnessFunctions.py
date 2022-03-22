@@ -21,12 +21,15 @@ import scipy.spatial
 from parameters import *
 from rules import *
 from progressbar import printProgressBar #Import progress bar function.
+import time
+import ray
 
 
 
 
 
-
+# Ray task
+@ray.remote
 def fitness_func(solution, dictionary_rules):
     # Calculating the fitness value of each solution in the current population.
     # The fitness function calulates the sum of products between each input and its corresponding weight.
@@ -49,17 +52,30 @@ def fitness_func(solution, dictionary_rules):
     fitness = fitness / (counterWeights)
     return fitness, dictionary_rules_fitness
 
-def evaluate_blocks(block_to_ev, dictionary_rules): #Complete evaluation function for looping through every individual of a population.
+'''def evaluate_blocks(block_to_ev, dictionary_rules): #Complete evaluation function for looping through every individual of a population.
     population_size=block_to_ev.shape[0]
     printProgressBar(0, population_size, prefix = 'Population Evaluation Progress:', suffix = 'Complete', length = 50)
     ev_vector = np.zeros(population_size)
     list_of_dictionaries_rules = []
+    start_time = time.time()
     for pop in range(0, population_size):
         ev_vector[pop],dictionary_rules_fitness = fitness_func(block_to_ev[pop,:], dictionary_rules) #Change line to change to desired weight function.
         list_of_dictionaries_rules.append(dictionary_rules_fitness)
         printProgressBar(pop + 1, population_size, prefix = 'Population Evaluation Progress:', suffix = 'Complete', length = 50)
-    return ev_vector, list_of_dictionaries_rules #Returns evaluation vector.
+    duration = time.time() - start_time
+    print("Duration of evaluation: {}".format(duration))
+    return ev_vector, list_of_dictionaries_rules #Returns evaluation vector.'''
 
+def evaluate_blocks(block_to_ev, dictionary_rules): #Complete evaluation function for looping through every individual of a population.
+    population_size=block_to_ev.shape[0]
+    #printProgressBar(0, population_size, prefix = 'Population Evaluation Progress:', suffix = 'Complete', length = 50)
+    ev_vector = np.zeros(population_size)
+    list_of_dictionaries_rules = []*population_size
+    ray_object = ray.get([fitness_func.remote(block_to_ev[pop,:], dictionary_rules) for pop in range(population_size)])
+    ev_vector = [i[0] for i in ray_object]
+    list_of_dictionaries_rules = [i[1] for i in ray_object]
+    printProgressBar(population_size, population_size, prefix = 'Population Evaluation Progress:', suffix = 'Complete', length = 50)
+    return ev_vector, list_of_dictionaries_rules #Returns evaluation vector.
 
 
 

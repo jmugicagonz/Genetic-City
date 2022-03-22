@@ -30,6 +30,7 @@ def run_local(sequence_size):
     results = [fibonacci_local(sequence_size) for _ in range(os.cpu_count())]
     duration = time.time() - start_time
     print('Sequence size: {}, Local execution time: {}'.format(sequence_size, duration))
+    print('Local results are: {}'.format(results))
 
 # Ray
 def run_remote(sequence_size):
@@ -39,6 +40,7 @@ def run_remote(sequence_size):
     results = ray.get([fibonacci_distributed.remote(sequence_size) for _ in range(os.cpu_count())])
     duration = time.time() - start_time
     print('Sequence size: {}, Remote execution time: {}'.format(sequence_size, duration))
+    print('Remote results are: {}'.format(results))
 
 run_local(100000)
 run_remote(100000)

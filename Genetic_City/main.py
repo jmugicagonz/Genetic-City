@@ -17,15 +17,11 @@ MIT Media Lab - City Science Group
 """
 #TODO: REMOVE COMMENTED UNNECESSARY CODE 
 
-#from turtle import distance
 import numpy as np                                                              #Matrix and array handling.
 import matplotlib.pyplot as plt                                                 #Plotting
-import pygad as ga
 
-#from numpy import empty
 from blockgenerationfunctions import *                                          #Functions for creating new city arrays.
 from fitnessFunctions import *                                                  #Functions for evaluation fitness of cities.
-#from progressbar import printProgressBar                                       #Helps with progress bar in terminal.
 from crossfunctions import *                                                    #Functions for crossing individuals.
 from mutation_functions import *                                                #Functions for mutating individuals.
 from selectionFunctions import *                                                #Functions for best individual selection.
@@ -38,7 +34,7 @@ from initFunctions import *                                                     
 
 #Placeholder variables
 population_matrix = np.arange(block_size * block_size) # Matrix for storing populations within process.
-selected_matrix = np.zeros((population_size, block_size*block_size)) # Matrix for selectec populations within process.
+selected_matrix = np.zeros((population_size, block_size*block_size)) # Matrix for selected populations within process.
 gen = np.arange(num_generations) + 1
 final_blocks = np.zeros((block_size*city_size,block_size*city_size )) # Matrix for storing the best blocks coming from the last iteration
 so_far_blocks = np.zeros((block_size*city_size,block_size*city_size )) # Matrix for storing the best blocks coming from some iterations and see the progress
@@ -66,6 +62,9 @@ counter4 = 1
 
 #Create list to store fitness for different rules
 fitness_rules_solutions = []
+
+# Starting Ray for parallelization
+ray.init()
 
 for column_blocks in range(city_size):
 
@@ -123,15 +122,6 @@ for column_blocks in range(city_size):
         #if visualizations: np.savetxt('C:/Users/adminlocal/Documents/WorkspacesPython/Genetic-City/Genetic_City/plotting/block'+str(column_blocks)+'_'+str(row_blocks)+'gen'+str(generation)+'.txt',final_blocks,delimiter=',')
 
 
-
-
-'''unique, counts = np.unique(final_blocks,return_index=False, return_inverse=False, return_counts=True, axis=None)
-print("Number of parks: ")
-print(counts[0])
-print("Number of elements: ")
-print(np.size(final_blocks))
-print("Final proportion: ")
-print(counts[0]/np.size(final_blocks))'''
 matrix_with_roads = include_roads(final_blocks)
 matrix_with_roads_amplified = matrix_for_visualization(matrix_with_roads)
 #if visualizations: np.savetxt('C:/Users/adminlocal/Documents/WorkspacesPython/Genetic-City/Genetic_City/plotting/block'+'solution_amplified'+'.txt',matrix_with_roads_amplified,delimiter=',')
