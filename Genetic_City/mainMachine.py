@@ -110,13 +110,14 @@ class MainMachine(StateMachine):
                 ids = dict()
                 set_recheck = set(np.arange(len(ids_p)))
                 changes_counter = 0
-                while(len(set_recheck)>0):
+                while(len(set_recheck)>0 or changes_counter<2):
                     i = set_recheck.pop()
                     if ids_p[i]!=-1:
                     #ids[i] = ids_p[i]
                         if ids_p[i]!=self.ids[i]:
                             changes_counter += 1
                             ids.add([i,ids_p[i]])
+                            if(changes_counter >= 2): break
                     else:
                         set_recheck.add(i)
                         data1, address = self.s.recvfrom(4096)
