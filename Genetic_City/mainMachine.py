@@ -100,32 +100,32 @@ class MainMachine(StateMachine):
     def on_interact(self):
         while True:
             print("Please interact with the table and type 'c' to send interaction")
-            print("Press 'e' to exit")
-            ch = input("['c','e']>>>")
-            if ch == "c":
-                changes_counter = 0
-                ids = dict()
-                while(changes_counter<2):
-                    data1, address = self.s.recvfrom(4096)
-                    data2 = data1.decode("utf-8")
-                    ids_p = [int(id) for id in data2.split(' ')[1:-1]]
-                    for i in np.arange(len(ids_p)):
-                        if ids_p[i]!=-1 and ids_p[i]!=self.ids[i]:
-                            changes_counter += 1
-                            ids[i] = ids_p[i]
-                print("Ids selected are: {}".format(ids))
-                for element in ids:
-                    self.ids[element] = ids[element]
-                print("Ids to be sent are: {}".format(ids))
-                "You send a new vector with land uses to the cityIO"
-                landUsesToSend = []
-                for i in range(len(self.ids)):
+            #print("Press 'e' to exit")
+            #ch = input("['c','e']>>>")
+            #if ch == "c":
+            changes_counter = 0
+            ids = dict()
+            while(changes_counter<2):
+                data1, address = self.s.recvfrom(4096)
+                data2 = data1.decode("utf-8")
+                ids_p = [int(id) for id in data2.split(' ')[1:-1]]
+                for i in np.arange(len(ids_p)):
+                    if ids_p[i]!=-1 and ids_p[i]!=self.ids[i]:
+                        changes_counter += 1
+                        ids[i] = ids_p[i]
+            print("Ids selected are: {}".format(ids))
+            for element in ids:
+                self.ids[element] = ids[element]
+            print("Ids to be sent are: {}".format(ids))
+            "You send a new vector with land uses to the cityIO"
+            landUsesToSend = []
+            for i in range(len(self.ids)):
                     landUsesToSend.append(self.idsUses[self.ids[i]])
-                print("Land uses to send is: {}".format(landUsesToSend))
-                max_height = 200
-                self.H.update_geogrid_data(update_land_uses, grid_list=landUsesToSend, dict_landUses=dict_landUses, height=max_height)
-            elif ch == "e":
-                break    
+            print("Land uses to send is: {}".format(landUsesToSend))
+            max_height = 200
+            self.H.update_geogrid_data(update_land_uses, grid_list=landUsesToSend, dict_landUses=dict_landUses, height=max_height)
+            '''elif ch == "e":
+                break  '''  
 
     def on_resume(self):
         print("Starting the genetic algorithm")
