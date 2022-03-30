@@ -112,10 +112,10 @@ class MainMachine(StateMachine):
                     for i in np.arange(len(ids_p)):
                         if ids_p[i]!=-1 and ids_p[i]!=self.ids[i]:
                             changes_counter += 1
-                            ids.add([i,ids_p[i]])
+                            ids[i] = ids_p[i]
                 print("Ids selected are: {}".format(ids))
                 for element in ids:
-                    self.ids[element[0]] = element[1]
+                    self.ids[element] = ids[element]
                 print("Ids to be sent are: {}".format(ids))
                 "You send a new vector with land uses to the cityIO"
                 landUsesToSend = []
