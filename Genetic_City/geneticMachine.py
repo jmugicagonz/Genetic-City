@@ -1,11 +1,12 @@
 import numpy as np
-from blockgenerationfunctions import *                                          #Functions for creating new city arrays.
-from fitnessFunctions import *                                                  #Functions for evaluation fitness of cities.
-from crossfunctions import *                                                    #Functions for crossing individuals.
-from mutation_functions import *                                                #Functions for mutating individuals.
-from selectionFunctions import *                                                #Functions for best individual selection.
+from brix import Handler  # Module to communicate with the CityIO
+from selectionfunctions import *  # Functions for best individual selection.
+
+from blockgenerationfunctions import *  # Functions for creating new city arrays.
+from crossfunctions import *  # Functions for crossing individuals.
+from fitnessFunctions import *  # Functions for evaluation fitness of cities.
+from mutation_functions import *  # Functions for mutating individuals.
 from parameters import *
-from brix import Handler                                                        #Module to communicate with the CityIO
 
 
 class GeneticMachine():

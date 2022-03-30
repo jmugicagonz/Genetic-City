@@ -16,6 +16,7 @@ MIT Media Lab - City Science Group
 
 import numpy as np
 
+
 def select_mating_pool(fitness_vector,population, num_parents):
     # Selecting the best individuals in the current generation as parents for producing the offspring of the next generation.
     parents = np.empty((num_parents, population.shape[1]))

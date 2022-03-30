@@ -15,16 +15,15 @@ MIT Media Lab - City Science Group
 
 """
 
-import numpy as np                                                              #Matrix and array handling.
-import matplotlib.pyplot as plt                                                 #Plotting
-
-from plotting import *                                                          #Functions for plotting
-from connections import *                                                       #Import functions for including roads
-from initFunctions import *                                                     #Import initial calculations
-import keyboard                                                                 #Library for stopping the code when pressing a letter
+import keyboard  # Library for stopping the code when pressing a letter
+import matplotlib.pyplot as plt  # Plotting
+import numpy as np  # Matrix and array handling.
 import ray
-from mainMachine import MainMachine
 
+from connections import *  # Import functions for including roads
+from initFunctions import *  # Import initial calculations
+from mainMachine import MainMachine
+from plotting import *  # Functions for plotting
 
 #Initialise the Main Machine
 mainMachine = MainMachine()
