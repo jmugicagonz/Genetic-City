@@ -122,8 +122,6 @@ class MainMachine(StateMachine):
                         data1, address = self.s.recvfrom(4096)
                         data2 = data1.decode("utf-8")
                         ids_p = [int(id) for id in data2.split(' ')[1:-1]]
-                print("Press 'e' to stop calibration and go interacting")
-                ch = input("['c','e']>>>")
                 print("Ids selected are: {}".format(ids))
                 for element in ids:
                     self.ids[element[0]] = element[1]
