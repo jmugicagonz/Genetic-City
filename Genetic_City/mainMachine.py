@@ -66,7 +66,7 @@ class MainMachine(StateMachine):
         self.H.update_geogrid_data(update_land_uses, grid_list=self.genMachine.population_matrix[0,0:16], dict_landUses=dict_landUses, height=max_height)'''
 
     def on_calibrate(self):
-        print("Please calibrate the table")
+        print("Table automatic calibration. If blocked, try to move swap two pieces")
         ch = "c"
         while True:
             if ch == "c":
@@ -85,7 +85,7 @@ class MainMachine(StateMachine):
                         data1, address = self.s.recvfrom(4096)
                         data2 = data1.decode("utf-8")
                         ids_p = [int(id) for id in data2.split(' ')[1:-1]]
-                print("Press 'e' to stop calibration and go interacting")
+                print("Calibration completed. Press 'e' to stop calibration and go interacting")
                 ch = input("['c','e']>>>")
             elif ch == "e":
                 break
@@ -103,26 +103,16 @@ class MainMachine(StateMachine):
             print("Press 'e' to exit")
             ch = input("['c','e']>>>")
             if ch == "c":
-                data1, address = self.s.recvfrom(4096)
-                data2 = data1.decode("utf-8")
-                ids_p = [int(id) for id in data2.split(' ')[1:-1]]
-                #ids = [0]*len(ids_p)
-                ids = dict()
-                set_recheck = set(np.arange(len(ids_p)))
                 changes_counter = 0
-                while(len(set_recheck)>0 or changes_counter<2):
-                    i = set_recheck.pop()
-                    if ids_p[i]!=-1:
-                    #ids[i] = ids_p[i]
-                        if ids_p[i]!=self.ids[i]:
+                ids = dict()
+                while(changes_counter<2):
+                    data1, address = self.s.recvfrom(4096)
+                    data2 = data1.decode("utf-8")
+                    ids_p = [int(id) for id in data2.split(' ')[1:-1]]
+                    for i in np.arange(len(ids_p)):
+                        if ids_p[i]!=-1 and ids_p[i]!=self.ids[i]:
                             changes_counter += 1
                             ids.add([i,ids_p[i]])
-                            if(changes_counter >= 2): break
-                    else:
-                        set_recheck.add(i)
-                        data1, address = self.s.recvfrom(4096)
-                        data2 = data1.decode("utf-8")
-                        ids_p = [int(id) for id in data2.split(' ')[1:-1]]
                 print("Ids selected are: {}".format(ids))
                 for element in ids:
                     self.ids[element[0]] = element[1]
