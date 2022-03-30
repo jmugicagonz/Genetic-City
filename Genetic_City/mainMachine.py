@@ -98,7 +98,6 @@ class MainMachine(StateMachine):
         print("Ids uses are: {}".format(self.idsUses))
 
     def on_interact(self):
-        
         while True:
             print("Please interact with the table and type 'c' to send interaction")
             print("Press 'e' to exit")
@@ -107,12 +106,17 @@ class MainMachine(StateMachine):
                 data1, address = self.s.recvfrom(4096)
                 data2 = data1.decode("utf-8")
                 ids_p = [int(id) for id in data2.split(' ')[1:-1]]
-                ids = [0]*len(ids_p)
+                #ids = [0]*len(ids_p)
+                ids = dict()
                 set_recheck = set(np.arange(len(ids_p)))
+                changes_counter = 0
                 while(len(set_recheck)>0):
                     i = set_recheck.pop()
                     if ids_p[i]!=-1:
-                        ids[i] = ids_p[i]
+                    #ids[i] = ids_p[i]
+                        if ids_p[i]!=self.ids[i]:
+                            changes_counter += 1
+                            ids.add([i,ids_p[i]])
                     else:
                         set_recheck.add(i)
                         data1, address = self.s.recvfrom(4096)
@@ -121,7 +125,8 @@ class MainMachine(StateMachine):
                 print("Press 'e' to stop calibration and go interacting")
                 ch = input("['c','e']>>>")
                 print("Ids selected are: {}".format(ids))
-                self.ids = ids.copy()
+                for element in ids:
+                    self.ids[element[0]] = element[1]
                 print("Ids to be sent are: {}".format(ids))
                 "You send a new vector with land uses to the cityIO"
                 landUsesToSend = []
