@@ -22,9 +22,12 @@ prob_mutation = .1 # Must be between 0 and 1
 crossover_value = .9 # The point at which crossover takes place between two parents. Usually, it is at the center.
 
 "City Parameters"
-block_size = 15 # Size of the area to optimise (square dimension)
+block_size = 8 # Size of the area to optimise (square dimension)
 building_types = 3 # [1 = Park, 2 = Office, 3 = Residential]
 cmap = ListedColormap(["forestgreen","lightcoral","lightgray","dimgray"])
+
+"Values to define land uses and initialise the connection to the table"
+dict_landUses = {1: 'Campus', 2: 'Industrial', 3: 'Residential'}
 
 ""
 visualizations = True # True: Images should be saved. False otherwise

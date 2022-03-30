@@ -1,6 +1,9 @@
+from geneticMachine import *
 from parameters import *
 import scipy.stats
 from rules import *
+import sys                                                                      #Library to read from server
+
 
 # Matrix with the block size and where each element is equal to the tuple that gives its position. Used for Manhattan lookUp matrix
 def block_matrix(grid_size):
@@ -16,8 +19,6 @@ distance_table  = manhattan_table(block_matrix(block_size))
 
 #Calculation of look_up distance table matrix with roads
 distance_table_roads  = manhattan_table(block_matrix((block_size)*2-1))
-
-
 
 #Normal distributions for housing
 nd_small_house = scipy.stats.norm(percentage_small_housing, 0.2)
