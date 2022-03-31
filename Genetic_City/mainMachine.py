@@ -120,19 +120,22 @@ class MainMachine(StateMachine):
             #print("Press 'e' to exit")
             #ch = input("['c','e']>>>")
             #if ch == "c":
-            changes_counter = 0
+            considered_changes = set()
             ids = dict()
-            while(changes_counter<2):
+            while(len(considered_changes)<2):
                 data1, address = self.s.recvfrom(4096)
                 data2 = data1.decode("utf-8")
                 ids_p = [int(id) for id in data2.split(' ')[1:-1]]
                 for i in np.arange(len(ids_p)):
-                    if ids_p[i]!=-1 and ids_p[i]!=self.ids[i] and (ids_p[i] in self.idsUses):
-                        changes_counter += 1
-                        ids.add([i,ids_p[i]])
+                    if ids_p[i]!=-1 and ids_p[i]!=self.ids[i] and (ids_p[i] in self.idsUses) and (i not in considered_changes):
+                        print("Change counter increased")
+                        print("Triggering id is: {}".format(ids_p[i]))
+                        print("Original id is: {}".format(self.ids[i]))
+                        ids[i] = ids_p[i]
+                        considered_changes.add(i)
             print("Ids selected are: {}".format(ids))
             for element in ids:
-                self.ids[element[0]] = element[1]
+                self.ids[element] = ids[element]
             print("Ids to be sent are: {}".format(ids))
             "You send a new vector with land uses to the cityIO"
             landUsesToSend = []
