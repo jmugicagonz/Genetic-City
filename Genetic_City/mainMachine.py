@@ -53,7 +53,7 @@ class MainMachine(StateMachine):
                 max_height = int((self.generation+1)*2)
                 if max_height>500: max_height=500
                 landUses_to_send = self.genMachine.population_matrix[0, :]
-                grid_to_send = []
+                self.grid_to_send = []*np.arange(len(landUses_to_send))
                 for i in np.arange(len(landUses_to_send)):
                     randomTall = random.uniform(0,1)
                     randomH = random.randint(0,max_height)
@@ -66,20 +66,15 @@ class MainMachine(StateMachine):
                         elif randomTall >= 0.5: height = randomH
                         else: height = int(0.5*randomH)
                     elif landUses_to_send[i] == 1: height = 0
-                    grid_to_send.append((landUses_to_send[i],height))
-                change_height = True
-                self.H.update_geogrid_data(update_land_uses, grid_list=grid_to_send, dict_landUses=dict_landUses, change_height=change_height)
+                    self.grid_to_send[i] = (landUses_to_send[i],height)
+                self.H.update_geogrid_data(update_land_uses, grid_list= self.grid_to_send, dict_landUses=dict_landUses)
                 print("Press intro to continue")
                 print("Press 'e' to go and calibrate the table")
                 ch = input("['c','e']>>>")
                 if ch == "e":
                     break 
-
             self.generation +=1
         i = 0
-        '''self.genMachine.population_matrix[0,0:16] = [1,2,3,3,3,3,2,1,2,3,3,1,2,3,3,1]
-        max_height = 200
-        self.H.update_geogrid_data(update_land_uses, grid_list=self.genMachine.population_matrix[0,0:16], dict_landUses=dict_landUses, height=max_height)'''
 
     def on_calibrate(self):
         print("Table automatic calibration. If blocked, try to move swap two pieces")
@@ -108,10 +103,10 @@ class MainMachine(StateMachine):
 
         print("Ids selected are: {}".format(ids))
         self.ids = ids.copy()
-        self.idsUses = dict()
+        self.idsUsesHeights = dict()
         for i in range(len(self.ids)):
-            self.idsUses[ids[i]] = self.genMachine.population_matrix[0, i]
-        print("Ids uses are: {}".format(self.idsUses))
+            self.idsUsesHeights[ids[i]] = self.grid_to_send[i]
+        print("Ids uses are: {}".format(self.idsUsesHeights))
 
     def on_interact(self):
         while True:
@@ -137,12 +132,13 @@ class MainMachine(StateMachine):
                 self.ids[element] = ids[element]
             print("Ids to be sent are: {}".format(ids))
             "You send a new vector with land uses to the cityIO"
-            landUsesToSend = []
+            self.grid_to_send = []
             for i in range(len(self.ids)):
-                    landUsesToSend.append(self.idsUses[self.ids[i]])
-            print("Land uses to send is: {}".format(landUsesToSend))
-            change_height = False
-            self.H.update_geogrid_data(update_land_uses, grid_list=landUsesToSend, dict_landUses=dict_landUses, change_height=change_height)
+                    landUse = self.idsUsesHeights[self.ids[i]][0]
+                    height = self.idsUsesHeights[self.ids[i]][1]
+                    self.grid_to_send.append((landUse, height))
+            print("Land uses and heights to send is: {}".format(self.grid_to_send))
+            self.H.update_geogrid_data(update_land_uses, grid_list=self.grid_to_send, dict_landUses=dict_landUses)
             '''elif ch == "e":
                 break  '''  
 
