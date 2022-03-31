@@ -68,7 +68,6 @@ class MainMachine(StateMachine):
                     elif landUses_to_send[i] == 1: height = 0
                     grid_to_send.append((landUses_to_send[i],height))
                 change_height = True
-                print("Grid to send is: {}".format(grid_to_send))
                 self.H.update_geogrid_data(update_land_uses, grid_list=grid_to_send, dict_landUses=dict_landUses, change_height=change_height)
                 print("Press intro to continue")
                 print("Press 'e' to go and calibrate the table")
