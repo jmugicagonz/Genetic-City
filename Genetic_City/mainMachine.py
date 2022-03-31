@@ -14,7 +14,7 @@ from initFunctions import *                                                     
 import keyboard                                                                 #Library for stopping the code when pressing a letter
 import ray
 import socket                                                                   #Library to read from server
-
+import random
 
 class MainMachine(StateMachine):
     #Defining states and transitions
@@ -49,11 +49,28 @@ class MainMachine(StateMachine):
         while True:
             print("Generation : ", self.generation)
             self.genMachine.compute_generation()
-
             if self.generation%5 == 0: #Send values each three generations
-                max_height = 500
-                self.H.update_geogrid_data(update_land_uses, grid_list=self.genMachine.population_matrix[0, :], dict_landUses=dict_landUses, height=max_height)
-                print("Press 'c' to continue")
+                max_height = int((self.generation+1)*2)
+                if max_height>500: max_height=500
+                landUses_to_send = self.genMachine.population_matrix[0, :]
+                grid_to_send = []
+                for i in np.arange(len(landUses_to_send)):
+                    randomTall = random.uniform(0,1)
+                    randomH = random.randint(0,max_height)
+                    if landUses_to_send[i] == 2: 
+                        if randomTall >= 0.9: height = 4*randomH
+                        elif randomTall >= 0.5: height = 2*randomH
+                        else: height = randomH
+                    elif landUses_to_send[i] == 3: 
+                        if randomTall >= 0.8: height = 2*randomH
+                        elif randomTall >= 0.5: height = randomH
+                        else: height = int(0.5*randomH)
+                    elif landUses_to_send[i] == 1: height = 0
+                    grid_to_send.append((landUses_to_send[i],height))
+                change_height = True
+                print("Grid to send is: {}".format(grid_to_send))
+                self.H.update_geogrid_data(update_land_uses, grid_list=grid_to_send, dict_landUses=dict_landUses, change_height=change_height)
+                print("Press intro to continue")
                 print("Press 'e' to go and calibrate the table")
                 ch = input("['c','e']>>>")
                 if ch == "e":
@@ -122,8 +139,8 @@ class MainMachine(StateMachine):
             for i in range(len(self.ids)):
                     landUsesToSend.append(self.idsUses[self.ids[i]])
             print("Land uses to send is: {}".format(landUsesToSend))
-            max_height = 200
-            self.H.update_geogrid_data(update_land_uses, grid_list=landUsesToSend, dict_landUses=dict_landUses, height=max_height)
+            change_height = False
+            self.H.update_geogrid_data(update_land_uses, grid_list=landUsesToSend, dict_landUses=dict_landUses, change_height=change_height)
             '''elif ch == "e":
                 break  '''  
 

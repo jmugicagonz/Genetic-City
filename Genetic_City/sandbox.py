@@ -5,7 +5,5 @@ import socket
 import sys
 
 
-list1 = [0,1,2,3]
-list2 = list1
-list2[2] = 7
-print(list1)
+tuple = (0,1,2)
+print(tuple[2])
