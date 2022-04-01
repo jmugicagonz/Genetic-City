@@ -53,6 +53,7 @@ class MainMachine(StateMachine):
                 max_height = int((self.generation+1)*2)
                 if max_height>500: max_height=500
                 landUses_to_send = self.genMachine.population_matrix[0, :]
+                print(landUses_to_send)
                 self.grid_to_send = []*np.arange(len(landUses_to_send))
                 for i in np.arange(len(landUses_to_send)):
                     randomTall = random.uniform(0,1)
