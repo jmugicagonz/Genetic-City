@@ -53,8 +53,12 @@ class MainMachine(StateMachine):
                 max_height = int((self.generation+1)*2)
                 if max_height>500: max_height=500
                 landUses_to_send = self.genMachine.population_matrix[0, :]
+<<<<<<< HEAD
                 print(landUses_to_send)
                 self.grid_to_send = []*np.arange(len(landUses_to_send))
+=======
+                self.grid_to_send = [(0,0) for _ in np.arange(len(landUses_to_send))]
+>>>>>>> 4e0af6ddc514b9d49f9629f46b70cee1910a33f3
                 for i in np.arange(len(landUses_to_send)):
                     randomTall = random.uniform(0,1)
                     randomH = random.randint(0,max_height)
@@ -122,7 +126,7 @@ class MainMachine(StateMachine):
                 data2 = data1.decode("utf-8")
                 ids_p = [int(id) for id in data2.split(' ')[1:-1]]
                 for i in np.arange(len(ids_p)):
-                    if ids_p[i]!=-1 and ids_p[i]!=self.ids[i] and (ids_p[i] in self.idsUses) and (i not in considered_changes):
+                    if ids_p[i]!=-1 and ids_p[i]!=self.ids[i] and (ids_p[i] in self.idsUsesHeights) and (i not in considered_changes):
                         print("Change counter increased")
                         print("Triggering id is: {}".format(ids_p[i]))
                         print("Original id is: {}".format(self.ids[i]))
