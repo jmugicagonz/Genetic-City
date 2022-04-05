@@ -25,8 +25,7 @@ import time
 import ray
 
 
-# Ray task
-@ray.remote
+#Local task
 def fitness_func(solution, set_rules):
     # Calculating the fitness value of each solution in the current population.
     # The fitness function calulates the sum of products between each input and its corresponding weight.
@@ -49,11 +48,14 @@ def fitness_func(solution, set_rules):
     fitness = fitness / (counterWeights)
     return fitness, dictionary_rules_fitness
 
+# Ray task
+remote_fitness_func = ray.remote(fitness_func)
+
 def evaluate_blocks(block_to_ev, set_rules): #Complete evaluation function for looping through every individual of a population.
     population_size=block_to_ev.shape[0]
     ev_vector = np.zeros(population_size)
     list_of_dictionaries_rules = []*population_size
-    ray_object = ray.get([fitness_func.remote(block_to_ev[pop,:], set_rules) for pop in range(population_size)])
+    ray_object = ray.get([remote_fitness_func.remote(block_to_ev[pop,:], set_rules) for pop in range(population_size)])
     ev_vector = [i[0] for i in ray_object]
     list_of_dictionaries_rules = [i[1] for i in ray_object]
     printProgressBar(population_size, population_size, prefix = 'Population Evaluation Progress:', suffix = 'Complete', length = 50)
