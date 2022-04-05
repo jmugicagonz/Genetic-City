@@ -25,6 +25,8 @@ from initFunctions import *  # Import initial calculations
 from mainMachine import MainMachine
 from plotting import *  # Functions for plotting
 
+from initFunctions import * # Import init funcions
+
 #Initialise the Main Machine
 mainMachine = MainMachine()
 
