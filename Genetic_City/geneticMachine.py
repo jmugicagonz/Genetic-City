@@ -22,12 +22,15 @@ class GeneticMachine():
         self.best_outputs = []
         self.list_of_dictionaries_rules = []
 
+        #Creation of set for rules
+        self.set_rules = create_set_rules()
 
     def compute_generation(self):
-        fitness_vector, list_of_dictionaries_rules = evaluate_blocks(self.population_matrix, dictionary_rules)
-        best_match_idx = np.where(fitness_vector == np.max(fitness_vector))
+        fitness_vector, self.list_of_dictionaries_rules = evaluate_blocks(self.population_matrix, self.set_rules)
+        #If we want to plot the best value
+        '''best_match_idx = np.where(fitness_vector == np.max(fitness_vector))
         best_value = np.max(fitness_vector)
-        self.best_outputs.append(best_value)
+        self.best_outputs.append(best_value)'''
 
         # Selecting the best parents in the population for mating.
         parents = select_mating_pool(fitness_vector, self.population_matrix, num_parents_mating)

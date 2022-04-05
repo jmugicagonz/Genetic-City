@@ -34,10 +34,10 @@ fitness_rules_solutions = []
 # Starting Ray for parallelization
 ray.init()
 
-#START OF GENERATON LOOP ################################################################################################################
+#START OF GENERATON LOOP
 mainMachine.start()
 
-#START THE CALIBRATION OF THE TABLEc
+#START THE CALIBRATION OF THE TABLE
 mainMachine.calibrate()
 
 #BEGIN INTERACTION WITH PIECES

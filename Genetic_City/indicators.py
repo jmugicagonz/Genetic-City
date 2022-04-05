@@ -1,30 +1,9 @@
-from brix import Handler, Indicator
-from numpy import log
-from collections import Counter
+import json
+import requests
 
-class Diversity(Indicator):
-
-        def setup(self):
-                self.name = 'Entropy'
-
-        def load_module(self):
-                pass
-
-        def return_indicator(self, geogrid_data):
-                uses = [cell['name'] for cell in geogrid_data]
-                uses = [use for use in uses if use != 'None']
-
-                frequencies = Counter(uses)
-
-                total = sum(frequencies.values(), 0.0)
-                entropy = 0
-                for key in frequencies:
-                        p = frequencies[key]/total
-                        entropy += -p*log(p)
-
-                return entropy
-
-div = Diversity()
-H = Handler('geneticcity8')
-H.add_indicator(div)
-H.listen(new_thread=True)
+def post_indicators(table_name, dict_of_indicators):
+        headers = {'Content-Type': 'application/json'}
+        url='https://cityio.media.mit.edu/api/table/{}'.format(table_name)
+        indicators = [{"indicator_type":"numeric","name":key,"value":dict_of_indicators[key],"ref_value":0.7,"viz_type":"radar"} for key in dict_of_indicators]
+        print("Indicators are: {}".format(indicators))
+        r = requests.post(url+'/indicators', data = json.dumps(indicators), headers=headers)
