@@ -45,11 +45,10 @@ class GeneticMachine():
         self.population_matrix[0:parents.shape[0], :] = parents
         self.population_matrix[parents.shape[0]:, :] = offspring_mutation
 
-    def continue_generation(self):
-        interacted_population = [] #Insert here the calculated iteration
+    def continue_generation(self, given_proposal):
         new_random_population = create_population(num_parents_mating-1, block_size, building_types) #Creates new block.
         parents = np.arange(block_size * block_size) #Creates empty vector to be used to create matrix.
-        parents = np.vstack((parents, interacted_population)) #Adds interacted city.
+        parents = np.vstack((parents, given_proposal)) #Adds interacted city.
         parents = np.vstack((parents, new_random_population)) #Adds new random cities to complete the parents population
         parents = np.delete(parents, 0, 0) #Deletes fisrt row used as placeholder.
 

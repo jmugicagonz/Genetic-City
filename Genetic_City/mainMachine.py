@@ -47,7 +47,7 @@ class MainMachine(StateMachine):
         while True:
             print("Generation : ", self.generation)
             self.genMachine.compute_generation()
-            if self.generation%5 == 0: #Send values each three generations
+            if self.generation%5 == 0: #Send values each five generations
                 max_height = int((self.generation+1)*2)
                 if max_height>500: max_height=500
                 landUses_to_send = self.genMachine.population_matrix[0, :]
@@ -69,12 +69,12 @@ class MainMachine(StateMachine):
                     self.grid_to_send[i] = (landUses_to_send[i],height)
                 self.H.update_geogrid_data(update_land_uses, grid_list= self.grid_to_send, dict_landUses=dict_landUses)
                 post_indicators(self.table_name, indicators_to_send)
+                self.generation +=1
                 print("Press intro to continue")
                 print("Press 'e' to go and calibrate the table")
                 ch = input("['Intro','e']>>>")
                 if ch == "e":
                     break 
-            self.generation +=1
         #i = 0
 
     def on_calibrate(self):
@@ -106,9 +106,6 @@ class MainMachine(StateMachine):
         print("STARTING INTERACTION")
         while True:
             print("Please interact with the table")
-            #print("Press 'e' to exit")
-            #ch = input("['c','e']>>>")
-            #if ch == "c":
             considered_changes = set()
             ids = dict()
             while(len(considered_changes)<2):
@@ -128,36 +125,73 @@ class MainMachine(StateMachine):
             print("Ids to be sent are: {}".format(ids))
             "You send a new vector with land uses to the cityIO"
             self.grid_to_send = []
-            land_uses_to_evaluate = []
+            self.land_uses_from_interaction = []
             for i in range(len(self.ids)):
                     landUse = self.idsUsesHeights[self.ids[i]][0]
                     height = self.idsUsesHeights[self.ids[i]][1]
                     self.grid_to_send.append((landUse, height))
-                    land_uses_to_evaluate.append(landUse)
+                    self.land_uses_from_interaction.append(landUse)
             print("Land uses and heights to send is: {}".format(self.grid_to_send))
-            _, new_dictionary_rules_fitness = fitness_func(np.asarray(land_uses_to_evaluate), create_set_rules()) #TODO: modify to centralize parameters
+            _, new_dictionary_rules_fitness = fitness_func(np.asarray(self.land_uses_from_interaction), create_set_rules()) #TODO: modify to centralize parameters
             post_indicators(self.table_name, new_dictionary_rules_fitness)
             self.H.update_geogrid_data(update_land_uses, grid_list=self.grid_to_send, dict_landUses=dict_landUses)
-            '''elif ch == "e":
-                break  '''  
+            print("Press intro to continue or 'e' to continue running the genetic algorithm")
+            ch = input("['Intro','e']>>>")
+            if ch == "e":
+                break 
 
     def on_resume(self):
-        print("Starting the genetic algorithm")
+        print("RESUMING THE GENETIC ALGORITHM")
+        self.genMachine.continue_generation(self.land_uses_from_interaction)
+        max_height = int((self.generation+1)*2)
+        if max_height>500: max_height=500
+        landUses_to_send = self.genMachine.population_matrix[0, :]
+        indicators_to_send = self.genMachine.list_of_dictionaries_rules[0]
+        print("Indicators to send are: {}".format(indicators_to_send))
+        self.grid_to_send = [(0,0) for _ in np.arange(len(landUses_to_send))]
+        for i in np.arange(len(landUses_to_send)):
+            randomTall = np.random.uniform(0.0,1.0)
+            randomH = np.random.randint(0.0,float(max_height))
+            if landUses_to_send[i] == 2: 
+                if randomTall >= 0.9: height = 4*randomH
+                elif randomTall >= 0.5: height = 2*randomH
+                else: height = randomH
+            elif landUses_to_send[i] == 3: 
+                if randomTall >= 0.8: height = 2*randomH
+                elif randomTall >= 0.5: height = randomH
+                else: height = int(0.5*randomH)
+            elif landUses_to_send[i] == 1: height = 0
+            self.grid_to_send[i] = (landUses_to_send[i],height)
+        self.H.update_geogrid_data(update_land_uses, grid_list= self.grid_to_send, dict_landUses=dict_landUses)
+        post_indicators(self.table_name, indicators_to_send)
         while True:
-            if generation%5==0:
-                print("Press 'c' to continue and calculate more generations")
-                print("Press 'e' to exit and go calibrate the table")
-                ch = input("['c','e']>>>")
-            
-                if ch == "e":
-                    break   
-
-            print("Generation : ", generation)
-
+            print("Generation : ", self.generation)
             self.genMachine.compute_generation()
-
-            if generation%5 == 0: #Send values each three generations
-                max_height = 500
-                self.H.update_geogrid_data(update_land_uses, grid_list=self.genMachine.population_matrix[0, :], dict_landUses=dict_landUses, height=max_height)
-
-            generation +=1
+            if self.generation%5 == 0: #Send values each five generations
+                max_height = int((self.generation+1)*2)
+                if max_height>500: max_height=500
+                landUses_to_send = self.genMachine.population_matrix[0, :]
+                indicators_to_send = self.genMachine.list_of_dictionaries_rules[0]
+                print("Indicators to send are: {}".format(indicators_to_send))
+                self.grid_to_send = [(0,0) for _ in np.arange(len(landUses_to_send))]
+                for i in np.arange(len(landUses_to_send)):
+                    randomTall = np.random.uniform(0.0,1.0)
+                    randomH = np.random.randint(0.0,float(max_height))
+                    if landUses_to_send[i] == 2: 
+                        if randomTall >= 0.9: height = 4*randomH
+                        elif randomTall >= 0.5: height = 2*randomH
+                        else: height = randomH
+                    elif landUses_to_send[i] == 3: 
+                        if randomTall >= 0.8: height = 2*randomH
+                        elif randomTall >= 0.5: height = randomH
+                        else: height = int(0.5*randomH)
+                    elif landUses_to_send[i] == 1: height = 0
+                    self.grid_to_send[i] = (landUses_to_send[i],height)
+                self.H.update_geogrid_data(update_land_uses, grid_list= self.grid_to_send, dict_landUses=dict_landUses)
+                post_indicators(self.table_name, indicators_to_send)
+                self.generation +=1
+                print("Press intro to continue")
+                print("Press 'e' to go and calibrate the table")
+                ch = input("['Intro','e']>>>")
+                if ch == "e":
+                    break

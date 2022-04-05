@@ -44,6 +44,9 @@ mainMachine.calibrate()
 #BEGIN INTERACTION WITH PIECES
 mainMachine.interact()
 
+#CONTINUE GENETIC ALGORITHM
+mainMachine.resume()
+
 '''# Getting the best solution after iterating finishing all generations.
 #At first, the fitness is calculated for each solution in the final generation.
 fitness_vector, list_of_dictionaries_rules = evaluate_blocks(population_matrix, dictionary_rules) # Then return the index of that solution corresponding to the best fitness.
