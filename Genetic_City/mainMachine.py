@@ -69,12 +69,13 @@ class MainMachine(StateMachine):
                     self.grid_to_send[i] = (landUses_to_send[i],height)
                 self.H.update_geogrid_data(update_land_uses, grid_list= self.grid_to_send, dict_landUses=dict_landUses)
                 post_indicators(self.table_name, indicators_to_send)
-                self.generation +=1
                 print("Press intro to continue")
                 print("Press 'e' to go and calibrate the table")
                 ch = input("['Intro','e']>>>")
                 if ch == "e":
-                    break 
+                    break
+            self.generation +=1
+        self.generation +=1 
         #i = 0
 
     def on_calibrate(self):
@@ -189,9 +190,10 @@ class MainMachine(StateMachine):
                     self.grid_to_send[i] = (landUses_to_send[i],height)
                 self.H.update_geogrid_data(update_land_uses, grid_list= self.grid_to_send, dict_landUses=dict_landUses)
                 post_indicators(self.table_name, indicators_to_send)
-                self.generation +=1
                 print("Press intro to continue")
                 print("Press 'e' to go and calibrate the table")
                 ch = input("['Intro','e']>>>")
                 if ch == "e":
                     break
+            self.generation +=1
+        self.generation +=1
