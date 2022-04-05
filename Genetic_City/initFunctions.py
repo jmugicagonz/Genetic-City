@@ -1,7 +1,6 @@
 from geneticMachine import *
 from parameters import *
 import scipy.stats
-from rules import *
 import sys                                                                      #Library to read from server
 
 

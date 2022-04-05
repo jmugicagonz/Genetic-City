@@ -24,6 +24,8 @@ from connections import *  # Import functions for including roads
 from initFunctions import *  # Import initial calculations
 from mainMachine import MainMachine
 from plotting import *  # Functions for plotting
+from parameters import *
+from initFunctions import *
 
 #Initialise the Main Machine
 mainMachine = MainMachine()
