@@ -1,5 +1,6 @@
 from statemachine import StateMachine, State
-import keyboard                                                                 #Library for stopping the code when pressing a letter
+import keyboard
+from Genetic_City.rules import create_set_rules                                                                 #Library for stopping the code when pressing a letter
 from onlineGrid import *                                                        #Import functions to support online grid
 from parameters import *
 
@@ -16,6 +17,7 @@ import ray
 import socket                                                                   #Library to read from server
 import random
 from indicators import *
+from fitnessFunctions import fitness_func
 
 class MainMachine(StateMachine):
     #Defining states and transitions
@@ -137,11 +139,15 @@ class MainMachine(StateMachine):
             print("Ids to be sent are: {}".format(ids))
             "You send a new vector with land uses to the cityIO"
             self.grid_to_send = []
+            land_uses_to_evaluate = []
             for i in range(len(self.ids)):
                     landUse = self.idsUsesHeights[self.ids[i]][0]
                     height = self.idsUsesHeights[self.ids[i]][1]
                     self.grid_to_send.append((landUse, height))
+                    land_uses_to_evaluate.append(landUse)
             print("Land uses and heights to send is: {}".format(self.grid_to_send))
+            _, new_dictionary_rules_fitness = fitness_func(land_uses_to_evaluate, create_set_rules()) #TODO: modify to centralize parameters
+            post_indicators(self.table_name, new_dictionary_rules_fitness)
             self.H.update_geogrid_data(update_land_uses, grid_list=self.grid_to_send, dict_landUses=dict_landUses)
             '''elif ch == "e":
                 break  '''  
