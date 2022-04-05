@@ -15,6 +15,7 @@ import keyboard                                                                 
 import ray
 import socket                                                                   #Library to read from server
 import random
+from indicators import *
 
 class MainMachine(StateMachine):
     #Defining states and transitions
@@ -53,6 +54,8 @@ class MainMachine(StateMachine):
                 max_height = int((self.generation+1)*2)
                 if max_height>500: max_height=500
                 landUses_to_send = self.genMachine.population_matrix[0, :]
+                indicators_to_send = self.genMachine.list_of_dictionaries_rules[0]
+                print("Indicators to send are: {}".format(indicators_to_send))
                 self.grid_to_send = [(0,0) for _ in np.arange(len(landUses_to_send))]
                 for i in np.arange(len(landUses_to_send)):
                     randomTall = random.uniform(0,1)
@@ -68,6 +71,7 @@ class MainMachine(StateMachine):
                     elif landUses_to_send[i] == 1: height = 0
                     self.grid_to_send[i] = (landUses_to_send[i],height)
                 self.H.update_geogrid_data(update_land_uses, grid_list= self.grid_to_send, dict_landUses=dict_landUses)
+                post_indicators(self.table_name, indicators_to_send)
                 print("Press intro to continue")
                 print("Press 'e' to go and calibrate the table")
                 ch = input("['c','e']>>>")
@@ -110,7 +114,7 @@ class MainMachine(StateMachine):
 
     def on_interact(self):
         while True:
-            print("Please interact with the table and type 'c' to send interaction")
+            print("Please interact with the table")
             #print("Press 'e' to exit")
             #ch = input("['c','e']>>>")
             #if ch == "c":
