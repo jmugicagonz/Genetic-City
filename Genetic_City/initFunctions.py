@@ -1,8 +1,6 @@
-from geneticMachine import *
-from parameters import *
 import scipy.stats
-import sys                                                                      #Library to read from server
 
+from parameters import *
 
 # Matrix with the block size and where each element is equal to the tuple that gives its position. Used for Manhattan lookUp matrix
 def block_matrix(grid_size):

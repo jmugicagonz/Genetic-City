@@ -17,11 +17,9 @@ MIT Media Lab - City Science Group
 from tracemalloc import stop
 from matplotlib.pyplot import grid
 import numpy as np
-import scipy.spatial
+from progressbar import printProgressBar #Import progress bar function.
 from parameters import *
 from rules import *
-from progressbar import printProgressBar #Import progress bar function.
-import time
 import ray
 
 

@@ -2,8 +2,7 @@ from itertools import groupby, product
 import numpy as np
 import copy
 from parameters import *
-from connections import *
-from parameters import *
+from initFunctions import *  # Import initial calculations
 
 "1"
 "Refers to things that should be closer to the road. Office +2, Housing +1, Park + 0"

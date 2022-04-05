@@ -1,24 +1,17 @@
 from statemachine import StateMachine, State
-import keyboard                                                                 #Library for stopping the code when pressing a letter
-                                                                 
-from onlineGrid import *                                                        #Import functions to support online grid
-from parameters import *
-
-
-
+import keyboard                                                                 #Library for stopping the code when pressing a letter                                                            
 import numpy as np                                                              #Matrix and array handling.
 import matplotlib.pyplot as plt                                                 #Plotting
 
 from plotting import *                                                          #Functions for plotting
-from connections import *                                                       #Import functions for including roads
-from initFunctions import *                                                     #Import initial calculations
 import keyboard                                                                 #Library for stopping the code when pressing a letter
 import ray
 import socket                                                                   #Library to read from server
-import random
-from indicators import *
-from fitnessFunctions import fitness_func
+
+#from fitnessFunctions import fitness_func
+from onlineGrid import *                                                        #Import functions to support online grid
 from parameters import *
+from geneticMachine import *
 
 class MainMachine(StateMachine):
     #Defining states and transitions
@@ -61,8 +54,8 @@ class MainMachine(StateMachine):
                 print("Indicators to send are: {}".format(indicators_to_send))
                 self.grid_to_send = [(0,0) for _ in np.arange(len(landUses_to_send))]
                 for i in np.arange(len(landUses_to_send)):
-                    randomTall = random.uniform(0,1)
-                    randomH = random.randint(0,max_height)
+                    randomTall = np.random.uniform(0.0,1.0)
+                    randomH = np.random.randint(0.0,float(max_height))
                     if landUses_to_send[i] == 2: 
                         if randomTall >= 0.9: height = 4*randomH
                         elif randomTall >= 0.5: height = 2*randomH
