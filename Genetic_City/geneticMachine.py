@@ -44,3 +44,21 @@ class GeneticMachine():
         # Creating the new population based on the parents and offspring.
         self.population_matrix[0:parents.shape[0], :] = parents
         self.population_matrix[parents.shape[0]:, :] = offspring_mutation
+
+    def continue_generation(self):
+        interacted_population = [] #Insert here the calculated iteration
+        new_random_population = create_population(num_parents_mating-1, block_size, building_types) #Creates new block.
+        parents = np.arange(block_size * block_size) #Creates empty vector to be used to create matrix.
+        parents = np.vstack((parents, interacted_population)) #Adds interacted city.
+        parents = np.vstack((parents, new_random_population)) #Adds new random cities to complete the parents population
+        parents = np.delete(parents, 0, 0) #Deletes fisrt row used as placeholder.
+
+        #Cross
+        offspring_crossover = crossover(parents,offspring_size=(population_size-parents.shape[0], block_size*block_size),crossover_value=crossover_value)
+         
+        #Adding some variations to the offspring using mutation.
+        offspring_mutation = mutation(offspring_crossover, prob_mutation, block_size, building_types)
+    
+        # Creating the new population based on the parents and offspring.
+        self.population_matrix[0:parents.shape[0], :] = parents
+        self.population_matrix[parents.shape[0]:, :] = offspring_mutation
