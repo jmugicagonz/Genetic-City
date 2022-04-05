@@ -14,12 +14,13 @@ from parameters import *
 from geneticMachine import *
 
 class MainMachine(StateMachine):
-    #Defining states and transitions
+    #Defining states
     initialized = State('Initialized', initial=True)
     computing_generations = State('Computing')
     calibrating = State('Calibrating')
     user_interacting = State('Interacting')
 
+    #Defining transitions
     start = initialized.to(computing_generations)
     calibrate = computing_generations.to(calibrating)
     interact = calibrating.to(user_interacting)
@@ -70,37 +71,30 @@ class MainMachine(StateMachine):
                 post_indicators(self.table_name, indicators_to_send)
                 print("Press intro to continue")
                 print("Press 'e' to go and calibrate the table")
-                ch = input("['c','e']>>>")
+                ch = input("['Intro','e']>>>")
                 if ch == "e":
                     break 
             self.generation +=1
-        i = 0
+        #i = 0
 
     def on_calibrate(self):
-        print("Table automatic calibration. If blocked, try to move swap two pieces")
-        ch = "c"
-        while True:
-            if ch == "c":
-                print("Please move two pieces to let the system calibrate")
+        print("STARTING CALIBRATION")
+        print("Calibration should be automatic. If blocked, try to move swap two pieces")
+        data1, address = self.s.recvfrom(4096)
+        data2 = data1.decode("utf-8")
+        ids_p = [int(id) for id in data2.split(' ')[1:-1]]
+        ids = [0]*len(ids_p)
+        set_recheck = set(np.arange(len(ids_p)))
+        while(len(set_recheck)>0):
+            i = set_recheck.pop()
+            if ids_p[i]!=-1:
+                ids[i] = ids_p[i]
+            else:
+                set_recheck.add(i)
                 data1, address = self.s.recvfrom(4096)
                 data2 = data1.decode("utf-8")
                 ids_p = [int(id) for id in data2.split(' ')[1:-1]]
-                ids = [0]*len(ids_p)
-                set_recheck = set(np.arange(len(ids_p)))
-                while(len(set_recheck)>0):
-                    i = set_recheck.pop()
-                    if ids_p[i]!=-1:
-                        ids[i] = ids_p[i]
-                    else:
-                        set_recheck.add(i)
-                        data1, address = self.s.recvfrom(4096)
-                        data2 = data1.decode("utf-8")
-                        ids_p = [int(id) for id in data2.split(' ')[1:-1]]
-                print("Calibration completed. Press 'e' to stop calibration and go interacting")
-                ch = input("['c','e']>>>")
-            elif ch == "e":
-                break
-
+        print("Calibration completed.")
         print("Ids selected are: {}".format(ids))
         self.ids = ids.copy()
         self.idsUsesHeights = dict()
@@ -109,6 +103,7 @@ class MainMachine(StateMachine):
         print("Ids uses are: {}".format(self.idsUsesHeights))
 
     def on_interact(self):
+        print("STARTING INTERACTION")
         while True:
             print("Please interact with the table")
             #print("Press 'e' to exit")
