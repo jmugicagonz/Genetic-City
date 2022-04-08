@@ -13,6 +13,9 @@ from onlineGrid import *                                                        
 from parameters import *
 from geneticMachine import *
 
+import music
+
+
 class MainMachine(StateMachine):
     #Defining states
     initialized = State('Initialized', initial=True)
@@ -28,9 +31,11 @@ class MainMachine(StateMachine):
 
     #Initialise the Genetic Machine
     genMachine = GeneticMachine()
+    #Define boolean to play/pause the Genetic Machine
+    bool_continue_GM = False
 
     #Initialise connection to cityIO
-    table_name = 'geneticcity8'
+    table_name = 'geneticcity7'
     H = Handler(table_name)
 
     generation = 0 #Represents a counter to know how many generations have been computed
@@ -43,8 +48,13 @@ class MainMachine(StateMachine):
     s.bind(server_address) # Bind the socket to the port
 
     def on_start(self):
+        print("WHENEVER YOU ARE READY, PLAY THE GENETIC ALGORITHM")
+        while not self.bool_continue_GM:
+            self.check_play_pause()
         print("STARTING GENETIC ALGORITHM")
-        while True:
+        music.play_music()
+        #while not keyboard.is_pressed('e'):
+        while self.bool_continue_GM:
             print("Generation : ", self.generation)
             self.genMachine.compute_generation()
             if self.generation%5 == 0: #Send values each five generations
@@ -69,13 +79,15 @@ class MainMachine(StateMachine):
                     self.grid_to_send[i] = (landUses_to_send[i],height)
                 self.H.update_geogrid_data(update_land_uses, grid_list= self.grid_to_send, dict_landUses=dict_landUses)
                 post_indicators(self.table_name, indicators_to_send)
-                print("Press intro to continue")
+                '''print("Press intro to continue")
                 print("Press 'e' to go and calibrate the table")
                 ch = input("['Intro','e']>>>")
                 if ch == "e":
-                    break
+                    break'''
             self.generation +=1
-        self.generation +=1 
+            self.check_play_pause()
+        self.generation +=1
+        music.pause_music()
         #i = 0
 
     def on_calibrate(self):
@@ -84,6 +96,7 @@ class MainMachine(StateMachine):
         data1, address = self.s.recvfrom(4096)
         data2 = data1.decode("utf-8")
         ids_p = [int(id) for id in data2.split(' ')[1:-1]]
+        ids_p = ids_p[0:block_size*block_size]
         ids = [0]*len(ids_p)
         set_recheck = set(np.arange(len(ids_p)))
         while(len(set_recheck)>0):
@@ -95,6 +108,7 @@ class MainMachine(StateMachine):
                 data1, address = self.s.recvfrom(4096)
                 data2 = data1.decode("utf-8")
                 ids_p = [int(id) for id in data2.split(' ')[1:-1]]
+                ids_p = ids_p[0:block_size*block_size]
         print("Calibration completed.")
         print("Ids selected are: {}".format(ids))
         self.ids = ids.copy()
@@ -105,7 +119,8 @@ class MainMachine(StateMachine):
 
     def on_interact(self):
         print("STARTING INTERACTION")
-        while True:
+        #while not keyboard.is_pressed('e'):
+        while not self.bool_continue_GM:
             print("Please interact with the table")
             considered_changes = set()
             ids = dict()
@@ -113,6 +128,7 @@ class MainMachine(StateMachine):
                 data1, address = self.s.recvfrom(4096)
                 data2 = data1.decode("utf-8")
                 ids_p = [int(id) for id in data2.split(' ')[1:-1]]
+                ids_p = ids_p[0:block_size*block_size]
                 for i in np.arange(len(ids_p)):
                     if ids_p[i]!=-1 and ids_p[i]!=self.ids[i] and (ids_p[i] in self.idsUsesHeights) and (i not in considered_changes):
                         print("Change counter increased")
@@ -136,18 +152,20 @@ class MainMachine(StateMachine):
             _, new_dictionary_rules_fitness = fitness_func(np.asarray(self.land_uses_from_interaction), create_set_rules()) #TODO: modify to centralize parameters
             post_indicators(self.table_name, new_dictionary_rules_fitness)
             self.H.update_geogrid_data(update_land_uses, grid_list=self.grid_to_send, dict_landUses=dict_landUses)
-            print("Press intro to continue or 'e' to continue running the genetic algorithm")
+            '''print("Press intro to continue or 'e' to continue running the genetic algorithm")
             ch = input("['Intro','e']>>>")
             if ch == "e":
-                break 
+                break '''
+            self.check_play_pause()
 
     def on_resume(self):
         print("RESUMING THE GENETIC ALGORITHM")
         self.genMachine.continue_generation(self.land_uses_from_interaction)
-        while True:
+        #while not keyboard.is_pressed('e'):
+        while self.bool_continue_GM:
             print("Generation : ", self.generation)
             self.genMachine.compute_generation()
-            if self.generation%5 == 0: #Send values each five generations
+            if self.generation%5 == 0: # Send values each five generations
                 max_height = int((self.generation+1)*2)
                 if max_height>500: max_height=500
                 landUses_to_send = self.genMachine.population_matrix[0, :]
@@ -169,10 +187,29 @@ class MainMachine(StateMachine):
                     self.grid_to_send[i] = (landUses_to_send[i],height)
                 self.H.update_geogrid_data(update_land_uses, grid_list= self.grid_to_send, dict_landUses=dict_landUses)
                 post_indicators(self.table_name, indicators_to_send)
-                print("Press intro to continue")
+                '''print("Press intro to continue")
                 print("Press 'e' to go and calibrate the table")
                 ch = input("['Intro','e']>>>")
                 if ch == "e":
-                    break
+                    break'''
             self.generation +=1
+            self.check_play_pause()
         self.generation +=1
+
+    def check_play_pause(self):
+        data1, address = self.s.recvfrom(4096)
+        data2 = data1.decode("utf-8")
+        ids_p = [int(id) for id in data2.split(' ')[1:-1]]
+        while ids_p[pos_play_pause] == -1:
+            pass
+        if ids_p[pos_play_pause] == id_play:
+            self.continue_GM
+        if ids_p[pos_play_pause] == id_pause:
+            self.pause_GM
+
+    def continue_GM(self):
+        self.bool_continue_GM = True
+
+    def pause_GM(self):
+        self.bool_continue_GM = False
+

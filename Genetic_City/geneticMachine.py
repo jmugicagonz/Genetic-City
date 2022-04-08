@@ -1,5 +1,6 @@
 import numpy as np
 from brix import Handler  # Module to communicate with the CityIO
+import os
 
 from parameters import *
 # Functions for the Genetic Algorithm
@@ -25,8 +26,15 @@ class GeneticMachine():
         #Creation of set for rules
         self.set_rules = create_set_rules()
 
+        #Load weights for the genetic algorithm
+        self.weights = [] # Placeholder for weights before loading them in the next line
+        self.load_weights() # We load the weights for the first time
+        self.bool_weights = False #Bool to manage when to load weights
+
     def compute_generation(self):
-        fitness_vector, self.list_of_dictionaries_rules = evaluate_blocks(self.population_matrix, self.set_rules)
+        if self.bool_weights:
+            self.load_weights()
+        fitness_vector, self.list_of_dictionaries_rules = evaluate_blocks(self.population_matrix, self.set_rules, self.weights)
         #If we want to plot the best value
         '''best_match_idx = np.where(fitness_vector == np.max(fitness_vector))
         best_value = np.max(fitness_vector)
@@ -61,3 +69,19 @@ class GeneticMachine():
         # Creating the new population based on the parents and offspring.
         self.population_matrix[0:parents.shape[0], :] = parents
         self.population_matrix[parents.shape[0]:, :] = offspring_mutation
+
+    def load_weights(self, file_loc=str(os.getcwd())+'\Genetic_City\weights.txt'):
+        with open(file_loc) as f:
+            lines = f.readlines()
+            weights = dict()
+        for line in lines:
+            no_newline = line.replace("\n","")
+            splitted_line = no_newline.split(': ')
+            weights[splitted_line[0]] = int(splitted_line[1])
+        self.weights = weights
+        self.bool_weights = False
+        print("New weights are:  {}".format(self.weights))
+
+    def set_bool_weights(self):
+        self.bool_weights = True
+        print("Self bool_weights set to: {}".format(self.bool_weights))

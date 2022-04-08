@@ -19,7 +19,7 @@ def acces(solution,unique,counts,lists_of_distances):
 "2"
 def green_amount(solution,unique,counts,lists_of_distances):
     green_sq_meters_people_living = len(np.where(solution==3))*residence_density*park_space_per_person
-    sq_meters_of_parks = len(np.where(solution==3))*625
+    sq_meters_of_parks = len(np.where(solution==1))*625
     if(sq_meters_of_parks>=green_sq_meters_people_living): return 100
     fitness = sq_meters_of_parks/green_sq_meters_people_living*100
     return fitness

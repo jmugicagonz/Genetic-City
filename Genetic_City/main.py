@@ -35,17 +35,21 @@ fitness_rules_solutions = []
 # Starting Ray for parallelization
 ray.init()
 
+#Add keyboard hotkeys for different actions
+keyboard.add_hotkey('g',mainMachine.genMachine.set_bool_weights)
+
 #START OF GENERATON LOOP
 mainMachine.start()
 
 #START THE CALIBRATION OF THE TABLE
 mainMachine.calibrate()
 
-#BEGIN INTERACTION WITH PIECES
-mainMachine.interact()
+while not keyboard.is_pressed('t'):
+    #BEGIN INTERACTION WITH PIECES
+    mainMachine.interact()
 
-#CONTINUE GENETIC ALGORITHM
-mainMachine.resume()
+    #CONTINUE GENETIC ALGORITHM
+    mainMachine.resume()
 
 '''# Getting the best solution after iterating finishing all generations.
 #At first, the fitness is calculated for each solution in the final generation.

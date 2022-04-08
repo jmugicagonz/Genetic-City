@@ -2,10 +2,18 @@ from pygame import mixer
 
 mixer.init()
 mixer.music.load('C:/Users/adminlocal/Documents/WorkspacesPython/Genetic-City/Genetic_City/286.mp3')
-mixer.music.play()
+#mixer.music.play()
 
 
-while True:
+def play_music():
+    mixer.music.play()
+
+def pause_music():
+    mixer.music.pause()
+
+def resume_music():
+    mixer.music.unpause()
+'''while True:
     print("Press 'p' to pause")
     print("Press 'r' to resume")
     print("Press 'v' set volume")
@@ -22,4 +30,4 @@ while True:
         mixer.music.set_volume(v)
     elif ch == "e":
         mixer.music.stop()
-        break
+        break'''
