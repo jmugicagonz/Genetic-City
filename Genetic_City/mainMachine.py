@@ -93,7 +93,6 @@ class MainMachine(StateMachine):
                 if ch == "e":
                     break'''
             self.generation +=1
-            self.check_play_pause()
         self.generation +=1
         music.pause_music()
         #i = 0
