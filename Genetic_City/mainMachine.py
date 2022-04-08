@@ -36,6 +36,7 @@ class MainMachine(StateMachine):
     genMachine = GeneticMachine()
     #Define boolean to play/pause the Genetic Machine
     bool_continue_GM = False
+    bool_prev_state = False
 
     #Initialise connection to cityIO
     table_name = 'geneticcity7'
@@ -163,7 +164,6 @@ class MainMachine(StateMachine):
             ch = input("['Intro','e']>>>")
             if ch == "e":
                 break '''
-            self.check_play_pause()
 
     def on_resume(self):
         print("RESUMING THE GENETIC ALGORITHM")
@@ -200,7 +200,6 @@ class MainMachine(StateMachine):
                 if ch == "e":
                     break'''
             self.generation +=1
-            self.check_play_pause()
         self.generation +=1
 
     def check_play_pause(self):
@@ -214,10 +213,14 @@ class MainMachine(StateMachine):
                 data2 = data1.decode("utf-8")
                 ids_p = [int(id) for id in data2.split(' ')[1:-1]]
             if ids_p[pos_play_pause] == id_play:
-                print("Continuing algorithm")
+                if self.bool_prev_state == False:
+                    print("Continuing algorithm")
+                    self.bool_prev_state = True
                 self.continue_GM()
             if ids_p[pos_play_pause] == id_pause:
-                print("Pausing algorithm")
+                if self.bool_prev_state == True:
+                    print("Pausing algorithm")
+                    self.bool_prev_state = False
                 self.pause_GM()
 
     def continue_GM(self):
