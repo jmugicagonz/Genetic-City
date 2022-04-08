@@ -49,7 +49,7 @@ class MainMachine(StateMachine):
 
     def on_start(self):
         print("WHENEVER YOU ARE READY, PLAY THE GENETIC ALGORITHM")
-        while not self.bool_continue_GM:
+        while self.bool_continue_GM == False:
             self.check_play_pause()
         print("STARTING GENETIC ALGORITHM")
         music.play_music()
@@ -201,15 +201,19 @@ class MainMachine(StateMachine):
         data2 = data1.decode("utf-8")
         ids_p = [int(id) for id in data2.split(' ')[1:-1]]
         while ids_p[pos_play_pause] == -1:
-            pass
+            print("Id play pause equal to -1")
+            data1, address = self.s.recvfrom(4096)
+            data2 = data1.decode("utf-8")
+            ids_p = [int(id) for id in data2.split(' ')[1:-1]]
         if ids_p[pos_play_pause] == id_play:
-            self.continue_GM
+            print("Continuing algorithm")
+            self.continue_GM()
         if ids_p[pos_play_pause] == id_pause:
-            self.pause_GM
+            print("Pausing algorithm")
+            self.pause_GM()
 
     def continue_GM(self):
         self.bool_continue_GM = True
 
     def pause_GM(self):
         self.bool_continue_GM = False
-

@@ -1,7 +1,8 @@
 from pygame import mixer
+import os
 
 mixer.init()
-mixer.music.load('C:/Users/adminlocal/Documents/WorkspacesPython/Genetic-City/Genetic_City/286.mp3')
+mixer.music.load(str(os.getcwd())+'\song.mp3')
 #mixer.music.play()
 
 
