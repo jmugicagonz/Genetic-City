@@ -3,11 +3,14 @@ import keyboard                                                                 
 import numpy as np                                                              #Matrix and array handling.
 import matplotlib.pyplot as plt                                                 #Plotting
 
-from plotting import *                                                          #Functions for plotting
+import threading                                                                # Library to run multiple threads
+import time
 import keyboard                                                                 #Library for stopping the code when pressing a letter
 import ray
 import socket                                                                   #Library to read from server
 
+
+from plotting import *                                                          #Functions for plotting
 #from fitnessFunctions import fitness_func
 from onlineGrid import *                                                        #Import functions to support online grid
 from parameters import *
@@ -48,9 +51,14 @@ class MainMachine(StateMachine):
     s.bind(server_address) # Bind the socket to the port
 
     def on_start(self):
+        # Create a Thread with a function without any arguments
+        th = threading.Thread(target=self.check_play_pause)
+        # Start the thread
+        th.start()
         print("WHENEVER YOU ARE READY, PLAY THE GENETIC ALGORITHM")
         while not self.bool_continue_GM:
-            self.check_play_pause()
+            print("Waiting to start")
+            time.sleep(1)
         print("STARTING GENETIC ALGORITHM")
         music.play_music()
         #while not keyboard.is_pressed('e'):
@@ -197,15 +205,16 @@ class MainMachine(StateMachine):
         self.generation +=1
 
     def check_play_pause(self):
-        data1, address = self.s.recvfrom(4096)
-        data2 = data1.decode("utf-8")
-        ids_p = [int(id) for id in data2.split(' ')[1:-1]]
-        while ids_p[pos_play_pause] == -1:
-            pass
-        if ids_p[pos_play_pause] == id_play:
-            self.continue_GM
-        if ids_p[pos_play_pause] == id_pause:
-            self.pause_GM
+        while not keyboard.is_pressed('t'):
+            data1, address = self.s.recvfrom(4096)
+            data2 = data1.decode("utf-8")
+            ids_p = [int(id) for id in data2.split(' ')[1:-1]]
+            while ids_p[pos_play_pause] == -1:
+                pass
+            if ids_p[pos_play_pause] == id_play:
+                self.continue_GM
+            if ids_p[pos_play_pause] == id_pause:
+                self.pause_GM
 
     def continue_GM(self):
         self.bool_continue_GM = True
