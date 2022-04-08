@@ -70,7 +70,7 @@ class GeneticMachine():
         self.population_matrix[0:parents.shape[0], :] = parents
         self.population_matrix[parents.shape[0]:, :] = offspring_mutation
 
-    def load_weights(self, file_loc=str(os.getcwd())+'\Genetic_City\weights.txt'):
+    def load_weights(self, file_loc=str(os.getcwd())+'\weights.txt'):
         with open(file_loc) as f:
             lines = f.readlines()
             weights = dict()
