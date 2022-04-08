@@ -22,7 +22,7 @@ prob_mutation = .1 # Must be between 0 and 1
 crossover_value = .9 # The point at which crossover takes place between two parents. Usually, it is at the center.
 
 "City Parameters"
-block_size = 8 # Size of the area to optimise (square dimension)
+block_size = 7 # Size of the area to optimise (square dimension)
 building_types = 3 # [1 = Park, 2 = Office, 3 = Residential]
 cmap = ListedColormap(["forestgreen","lightcoral","lightgray","dimgray"])
 
@@ -36,7 +36,7 @@ path_to_code = "C:/Users/adminlocal/Documents/WorkspacesPython/Genetic-City/Gene
 '''PARAMETERS FOR RULES'''
 
 "Weights for rules: "
-weights = np.array( #Weights used by function to evaluate. Places more interest in high numbers.
+'''weights = np.array( #Weights used by function to evaluate. Places more interest in high numbers.
     [1, #1: accesibility
     1, #2: green_space_balance_amount 
     60, #3: green_space_balance_width
@@ -46,7 +46,7 @@ weights = np.array( #Weights used by function to evaluate. Places more interest 
     1, #7: access_to_parks
     1, #8: house_office_balance
     1, #9: people_fitting
-    1, ]) #10: distances_homes_offices_parks
+    1, ]) #10: distances_homes_offices_parks'''
 
 "Population/Area parameters for rules"
 min_num_people_to_fit = 5700 #Minimum number of people to fit in the space
@@ -84,3 +84,9 @@ percentage_large_office = 0.8
 num_generations_saved = 20 # >=1
 time_per_image = 500 #Time in ms for each image in the GIF
 save_data = False
+
+
+'''PARAMETERS ARUCO TAGS'''
+id_play = 227 # Id of the Aruco tag representing the play buttong
+id_pause = 128 # Id of the Aruco tag representing the pause button
+pos_play_pause = 49 # Position of the Aruco tag for the play/pause button
