@@ -30,7 +30,8 @@ class MainMachine(StateMachine):
     start = initialized.to(computing_generations)
     calibrate = computing_generations.to(calibrating)
     interact = calibrating.to(user_interacting)
-    resume = user_interacting.to(computing_generations)
+    resume_genetic = user_interacting.to(computing_generations)
+    resume_interaction = computing_generations.to(user_interacting)
 
     #Initialise the Genetic Machine
     genMachine = GeneticMachine()
@@ -38,9 +39,13 @@ class MainMachine(StateMachine):
     bool_continue_GM = False
     bool_prev_state = False
 
-    #Initialise connection to cityIO
+    #Initialise connection to cityIO for TV
     table_name = 'geneticcity7'
     H = Handler(table_name)
+
+    # Initialise connection to cityIO for projection
+    table_name_projection = 'geneticcity7h0'
+    H_projection = Handler(table_name_projection)
 
     generation = 0 #Represents a counter to know how many generations have been computed
 
@@ -51,14 +56,36 @@ class MainMachine(StateMachine):
     server_address = (ip, port)
     s.bind(server_address) # Bind the socket to the port
 
+    def read_aruco_check_play_pause(self):
+        while not keyboard.is_pressed('t'):    
+            self.data1, address = self.s.recvfrom(4096)
+            data2 = self.data1.decode("utf-8")
+            ids_p = [int(id) for id in data2.split(' ')[1:-1]]
+            while ids_p[pos_play_pause] == -1:
+                print("Id play pause equal to -1")
+                '''data1, address = self.s.recvfrom(4096)
+                data2 = data1.decode("utf-8")
+                ids_p = [int(id) for id in data2.split(' ')[1:-1]]'''
+            if ids_p[pos_play_pause] == id_play:
+                if self.bool_prev_state == False:
+                    print("Continuing algorithm")
+                    self.bool_prev_state = True
+                self.continue_GM()
+            if ids_p[pos_play_pause] == id_pause:
+                if self.bool_prev_state == True:
+                    print("Pausing algorithm")
+                    self.bool_prev_state = False
+                self.pause_GM()
+
     def on_start(self):
+        # Initialise thread in parallel to read from ARUCO
         # Create a Thread with a function without any arguments
-        th = threading.Thread(target=self.check_play_pause)
+        self.th = threading.Thread(target=self.read_aruco_check_play_pause)
         # Start the thread
-        th.start()
+        self.th.start()
         print("WHENEVER YOU ARE READY, PLAY THE GENETIC ALGORITHM")
         while not self.bool_continue_GM:
-            print("Waiting to start")
+            print("Waiting to start. Replace the pause button by the play")
             time.sleep(1)
         print("STARTING GENETIC ALGORITHM")
         music.play_music()
@@ -73,6 +100,7 @@ class MainMachine(StateMachine):
                 indicators_to_send = self.genMachine.list_of_dictionaries_rules[0]
                 print("Indicators to send are: {}".format(indicators_to_send))
                 self.grid_to_send = [(0,0) for _ in np.arange(len(landUses_to_send))]
+                self.grid_to_send_projection = [(0,0) for _ in np.arange(len(landUses_to_send))]
                 for i in np.arange(len(landUses_to_send)):
                     randomTall = np.random.uniform(0.0,1.0)
                     randomH = np.random.randint(0.0,float(max_height))
@@ -86,7 +114,9 @@ class MainMachine(StateMachine):
                         else: height = int(0.5*randomH)
                     elif landUses_to_send[i] == 1: height = 0
                     self.grid_to_send[i] = (landUses_to_send[i],height)
+                    self.grid_to_send_projection[i] = (landUses_to_send[i],0)
                 self.H.update_geogrid_data(update_land_uses, grid_list= self.grid_to_send, dict_landUses=dict_landUses)
+                self.H_projection.update_geogrid_data(update_land_uses, grid_list= self.grid_to_send_projection, dict_landUses=dict_landUses)
                 post_indicators(self.table_name, indicators_to_send)
                 '''print("Press intro to continue")
                 print("Press 'e' to go and calibrate the table")
@@ -101,8 +131,8 @@ class MainMachine(StateMachine):
     def on_calibrate(self):
         print("STARTING CALIBRATION")
         print("Calibration should be automatic. If blocked, try to move swap two pieces")
-        data1, address = self.s.recvfrom(4096)
-        data2 = data1.decode("utf-8")
+        #data1, address = self.s.recvfrom(4096)
+        data2 = self.data1.decode("utf-8")
         ids_p = [int(id) for id in data2.split(' ')[1:-1]]
         ids_p = ids_p[0:block_size*block_size]
         ids = [0]*len(ids_p)
@@ -113,8 +143,8 @@ class MainMachine(StateMachine):
                 ids[i] = ids_p[i]
             else:
                 set_recheck.add(i)
-                data1, address = self.s.recvfrom(4096)
-                data2 = data1.decode("utf-8")
+                #data1, address = self.s.recvfrom(4096)
+                data2 = self.data1.decode("utf-8")
                 ids_p = [int(id) for id in data2.split(' ')[1:-1]]
                 ids_p = ids_p[0:block_size*block_size]
         print("Calibration completed.")
@@ -133,8 +163,8 @@ class MainMachine(StateMachine):
             considered_changes = set()
             ids = dict()
             while(len(considered_changes)<2):
-                data1, address = self.s.recvfrom(4096)
-                data2 = data1.decode("utf-8")
+                #data1, address = self.s.recvfrom(4096)
+                data2 = self.data1.decode("utf-8")
                 ids_p = [int(id) for id in data2.split(' ')[1:-1]]
                 ids_p = ids_p[0:block_size*block_size]
                 for i in np.arange(len(ids_p)):
@@ -150,22 +180,25 @@ class MainMachine(StateMachine):
             print("Ids to be sent are: {}".format(ids))
             "You send a new vector with land uses to the cityIO"
             self.grid_to_send = []
+            self.grid_to_send_projection = []
             self.land_uses_from_interaction = []
             for i in range(len(self.ids)):
                     landUse = self.idsUsesHeights[self.ids[i]][0]
                     height = self.idsUsesHeights[self.ids[i]][1]
                     self.grid_to_send.append((landUse, height))
+                    self.grid_to_send_projection.append((landUse,0))
                     self.land_uses_from_interaction.append(landUse)
             print("Land uses and heights to send is: {}".format(self.grid_to_send))
             _, new_dictionary_rules_fitness = fitness_func(np.asarray(self.land_uses_from_interaction), create_set_rules()) #TODO: modify to centralize parameters
             post_indicators(self.table_name, new_dictionary_rules_fitness)
             self.H.update_geogrid_data(update_land_uses, grid_list=self.grid_to_send, dict_landUses=dict_landUses)
+            self.H_projection.update_geogrid_data(update_land_uses, grid_list=self.grid_to_send_projection, dict_landUses=dict_landUses)
             '''print("Press intro to continue or 'e' to continue running the genetic algorithm")
             ch = input("['Intro','e']>>>")
             if ch == "e":
                 break '''
 
-    def on_resume(self):
+    def on_resume_genetic(self):
         print("RESUMING THE GENETIC ALGORITHM")
         self.genMachine.continue_generation(self.land_uses_from_interaction)
         #while not keyboard.is_pressed('e'):
@@ -178,7 +211,7 @@ class MainMachine(StateMachine):
                 landUses_to_send = self.genMachine.population_matrix[0, :]
                 indicators_to_send = self.genMachine.list_of_dictionaries_rules[0]
                 print("Indicators to send are: {}".format(indicators_to_send))
-                self.grid_to_send = [(0,0) for _ in np.arange(len(landUses_to_send))]
+                #self.grid_to_send = [(0,0) for _ in np.arange(len(landUses_to_send))]
                 for i in np.arange(len(landUses_to_send)):
                     randomTall = np.random.uniform(0.0,1.0)
                     randomH = np.random.randint(0.0,float(max_height))
@@ -192,7 +225,9 @@ class MainMachine(StateMachine):
                         else: height = int(0.5*randomH)
                     elif landUses_to_send[i] == 1: height = 0
                     self.grid_to_send[i] = (landUses_to_send[i],height)
+                    self.grid_to_send_projection[i] = (landUses_to_send[i],0)
                 self.H.update_geogrid_data(update_land_uses, grid_list= self.grid_to_send, dict_landUses=dict_landUses)
+                self.H_projection.update_geogrid_data(update_land_uses, grid_list= self.grid_to_send_projection, dict_landUses=dict_landUses)
                 post_indicators(self.table_name, indicators_to_send)
                 '''print("Press intro to continue")
                 print("Press 'e' to go and calibrate the table")
@@ -202,26 +237,49 @@ class MainMachine(StateMachine):
             self.generation +=1
         self.generation +=1
 
-    def check_play_pause(self):
-        while not keyboard.is_pressed('t'):    
-            data1, address = self.s.recvfrom(4096)
-            data2 = data1.decode("utf-8")
-            ids_p = [int(id) for id in data2.split(' ')[1:-1]]
-            while ids_p[pos_play_pause] == -1:
-                print("Id play pause equal to -1")
-                data1, address = self.s.recvfrom(4096)
-                data2 = data1.decode("utf-8")
+    def on_resume_interaction(self):
+        print("STARTING INTERACTION")
+        #while not keyboard.is_pressed('e'):
+        while not self.bool_continue_GM:
+            print("Please interact with the table")
+            considered_changes = set()
+            ids = dict()
+            while(len(considered_changes)<2):
+                #data1, address = self.s.recvfrom(4096)
+                data2 = self.data1.decode("utf-8")
                 ids_p = [int(id) for id in data2.split(' ')[1:-1]]
-            if ids_p[pos_play_pause] == id_play:
-                if self.bool_prev_state == False:
-                    print("Continuing algorithm")
-                    self.bool_prev_state = True
-                self.continue_GM()
-            if ids_p[pos_play_pause] == id_pause:
-                if self.bool_prev_state == True:
-                    print("Pausing algorithm")
-                    self.bool_prev_state = False
-                self.pause_GM()
+                ids_p = ids_p[0:block_size*block_size]
+                for i in np.arange(len(ids_p)):
+                    if ids_p[i]!=-1 and ids_p[i]!=self.ids[i] and (ids_p[i] in self.idsUsesHeights) and (i not in considered_changes):
+                        print("Change counter increased")
+                        print("Triggering id is: {}".format(ids_p[i]))
+                        print("Original id is: {}".format(self.ids[i]))
+                        ids[i] = ids_p[i]
+                        considered_changes.add(i)
+            print("Ids selected are: {}".format(ids))
+            for element in ids:
+                self.ids[element] = ids[element]
+            print("Ids to be sent are: {}".format(ids))
+            "You send a new vector with land uses to the cityIO"
+            self.grid_to_send = []
+            self.grid_to_send_projection = []
+            self.land_uses_from_interaction = []
+            for i in range(len(self.ids)):
+                    landUse = self.idsUsesHeights[self.ids[i]][0]
+                    height = self.idsUsesHeights[self.ids[i]][1]
+                    self.grid_to_send.append((landUse, height))
+                    self.grid_to_send_projection.append((landUse,0))
+                    self.land_uses_from_interaction.append(landUse)
+            print("Land uses and heights to send is: {}".format(self.grid_to_send))
+            _, new_dictionary_rules_fitness = fitness_func(np.asarray(self.land_uses_from_interaction), create_set_rules()) #TODO: modify to centralize parameters
+            post_indicators(self.table_name, new_dictionary_rules_fitness)
+            self.H.update_geogrid_data(update_land_uses, grid_list=self.grid_to_send, dict_landUses=dict_landUses)
+            self.H_projection.update_geogrid_data(update_land_uses, grid_list=self.grid_to_send_projection, dict_landUses=dict_landUses)
+            '''print("Press intro to continue or 'e' to continue running the genetic algorithm")
+            ch = input("['Intro','e']>>>")
+            if ch == "e":
+                break '''
+    
 
     def continue_GM(self):
         self.bool_continue_GM = True
