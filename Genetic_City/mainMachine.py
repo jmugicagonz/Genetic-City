@@ -133,8 +133,10 @@ class MainMachine(StateMachine):
             considered_changes = set()
             ids = dict()
             while(len(considered_changes)<2):
+                print("Reading data for interaction")
                 data1, address = self.s.recvfrom(4096)
                 data2 = data1.decode("utf-8")
+                print("Data read")
                 ids_p = [int(id) for id in data2.split(' ')[1:-1]]
                 ids_p = ids_p[0:block_size*block_size]
                 for i in np.arange(len(ids_p)):
@@ -157,7 +159,7 @@ class MainMachine(StateMachine):
                     self.grid_to_send.append((landUse, height))
                     self.land_uses_from_interaction.append(landUse)
             print("Land uses and heights to send is: {}".format(self.grid_to_send))
-            _, new_dictionary_rules_fitness = fitness_func(np.asarray(self.land_uses_from_interaction), create_set_rules()) #TODO: modify to centralize parameters
+            _, new_dictionary_rules_fitness = fitness_func(np.asarray(self.land_uses_from_interaction), create_set_rules(), self.genMachine.weights) #TODO: modify to centralize parameters
             post_indicators(self.table_name, new_dictionary_rules_fitness)
             self.H.update_geogrid_data(update_land_uses, grid_list=self.grid_to_send, dict_landUses=dict_landUses)
             '''print("Press intro to continue or 'e' to continue running the genetic algorithm")
