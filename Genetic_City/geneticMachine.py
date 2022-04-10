@@ -31,9 +31,19 @@ class GeneticMachine():
         self.load_weights() # We load the weights for the first time
         self.bool_weights = False #Bool to manage when to load weights
 
+
+        # Define dictionary to store those values that should not be touched
+        self.blocked = dict()
+        # Mask for those blocks that should not be touched
+        self.mask = [0]*(block_size*block_size)
+
     def compute_generation(self):
         if self.bool_weights:
             self.load_weights()
+        for solution in self.population_matrix:
+            for i in self.blocked:
+                solution[i] = self.blocked[i][0]
+                #Assign landuse to not change
         fitness_vector, self.list_of_dictionaries_rules = evaluate_blocks(self.population_matrix, self.set_rules, self.weights)
         #If we want to plot the best value
         '''best_match_idx = np.where(fitness_vector == np.max(fitness_vector))

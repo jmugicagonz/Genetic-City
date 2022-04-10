@@ -57,9 +57,6 @@ class MainMachine(StateMachine):
     server_address = (ip, port)
     s.bind(server_address) # Bind the socket to the port
 
-    #Define mask for ids not to be modified
-    mask = [0]*(block_size*block_size)
-
     def read_aruco_check_play_pause(self):
         while not keyboard.is_pressed('t'):    
             self.data1, address = self.s.recvfrom(4096)
@@ -154,28 +151,34 @@ class MainMachine(StateMachine):
             self.idsUsesHeights[ids[i]] = self.grid_to_send[i]
         print("Ids uses are: {}".format(self.idsUsesHeights))
 
-    def on_interact(self):
+    def on_interact(self): #TODO: copy this part in resume interaction
         print("STARTING INTERACTION")
         while not self.bool_continue_GM:
             print("Please interact with the table")
-            considered_changes = set()
+            sendChange = False
             ids = dict()
-            #while(len(considered_changes)<2):
-            data2 = self.data1.decode("utf-8")
-            ids_p = [int(id) for id in data2.split(' ')[1:-1]]
-            ids_p = ids_p[0:block_size*block_size]
-            for i in np.arange(len(ids_p)):
-                if ids_p[i]!=-1 and ids_p[i]!=self.ids[i] and (ids_p[i] in self.idsUsesHeights): # and (i not in considered_changes): TODO: eliminate this comment asap
-                    print("Change counter increased")
-                    print("Triggering id is: {}".format(ids_p[i]))
-                    print("Original id is: {}".format(self.ids[i]))
-                    ids[i] = ids_p[i]
-                    # considered_changes.add(i)
-            if self.bool_continue_GM: break
-            print("Ids selected are: {}".format(ids))
+            while not sendChange:
+                data2 = self.data1.decode("utf-8")
+                ids_p = [int(id) for id in data2.split(' ')[1:-1]]
+                ids_p = ids_p[0:block_size*block_size]
+                for i in np.arange(len(ids_p)):
+                    if ids_p[i]!=-1 and ids_p[i]!=self.ids[i]:
+                        if (ids_p[i] in self.idsUsesHeights):
+                            #print("Change counter increased")
+                            #print("Triggering id is: {}".format(ids_p[i]))
+                            #print("Original id is: {}".format(self.ids[i]))
+                            ids[i] = ids_p[i]
+                            sendChange = True
+                        elif ids_p[i] == id_block and i not in self.genMachine.blocked:
+                            landUse = self.idsUsesHeights[self.ids[i]][0]
+                            height = self.idsUsesHeights[self.ids[i]][1]
+                            self.genMachine.blocked[i] = [landUse,height]
+                            print("Mask of blockes is now: {}".format(self.genMachine.blocked))
+                if self.bool_continue_GM: break
+            #print("Ids selected are: {}".format(ids))
             for element in ids:
                 self.ids[element] = ids[element]
-            print("Ids to be sent are: {}".format(ids))
+            #print("Ids to be sent are: {}".format(ids))
             "You send a new vector with land uses to the cityIO"
             self.grid_to_send = []
             self.grid_to_send_projection = []
@@ -186,7 +189,7 @@ class MainMachine(StateMachine):
                     self.grid_to_send.append((landUse, height))
                     self.grid_to_send_projection.append((landUse,0))
                     self.land_uses_from_interaction.append(landUse)
-            print("Land uses and heights to send is: {}".format(self.grid_to_send))
+            #print("Land uses and heights to send is: {}".format(self.grid_to_send))
             _, new_dictionary_rules_fitness = fitness_func(np.asarray(self.land_uses_from_interaction), create_set_rules(), self.genMachine.weights) #TODO: modify to centralize parameters
             post_indicators(self.table_name, new_dictionary_rules_fitness)
             self.H.update_geogrid_data(update_land_uses, grid_list=self.grid_to_send, dict_landUses=dict_landUses)
@@ -208,17 +211,20 @@ class MainMachine(StateMachine):
                 print("Indicators to send are: {}".format(indicators_to_send))
                 #self.grid_to_send = [(0,0) for _ in np.arange(len(landUses_to_send))]
                 for i in np.arange(len(landUses_to_send)):
-                    randomTall = np.random.uniform(0.0,1.0)
-                    randomH = np.random.randint(0.0,float(max_height))
-                    if landUses_to_send[i] == 2: 
-                        if randomTall >= 0.9: height = 4*randomH
-                        elif randomTall >= 0.5: height = 2*randomH
-                        else: height = randomH
-                    elif landUses_to_send[i] == 3: 
-                        if randomTall >= 0.8: height = 2*randomH
-                        elif randomTall >= 0.5: height = randomH
-                        else: height = int(0.5*randomH)
-                    elif landUses_to_send[i] == 1: height = 0
+                    if i in self.genMachine.blocked:
+                        height = self.genMachine.blocked[i][1]
+                    else:
+                        randomTall = np.random.uniform(0.0,1.0)
+                        randomH = np.random.randint(0.0,float(max_height))
+                        if landUses_to_send[i] == 2: 
+                            if randomTall >= 0.9: height = 4*randomH
+                            elif randomTall >= 0.5: height = 2*randomH
+                            else: height = randomH
+                        elif landUses_to_send[i] == 3: 
+                            if randomTall >= 0.8: height = 2*randomH
+                            elif randomTall >= 0.5: height = randomH
+                            else: height = int(0.5*randomH)
+                        elif landUses_to_send[i] == 1: height = 0
                     self.grid_to_send[i] = (landUses_to_send[i],height)
                     self.grid_to_send_projection[i] = (landUses_to_send[i],0)
                 self.H.update_geogrid_data(update_land_uses, grid_list= self.grid_to_send, dict_landUses=dict_landUses)
@@ -228,10 +234,9 @@ class MainMachine(StateMachine):
         self.generation +=1
         music.pause_music()
 
-    def on_resume_calibrate(self):
+    def on_resume_calibrate(self): #TODO: refine calibration to take in account mask
         print("STARTING CALIBRATION")
         print("Calibration should be automatic. If blocked, try to move swap two pieces")
-        #data1, address = self.s.recvfrom(4096)
         data2 = self.data1.decode("utf-8")
         ids_p = [int(id) for id in data2.split(' ')[1:-1]]
         ids_p = ids_p[0:block_size*block_size]
@@ -257,27 +262,32 @@ class MainMachine(StateMachine):
 
     def on_resume_interaction(self):
         print("STARTING INTERACTION")
-        #while not keyboard.is_pressed('e'):
         while not self.bool_continue_GM:
             print("Please interact with the table")
-            considered_changes = set()
+            sendChange = False
             ids = dict()
-            while(len(considered_changes)<2):
+            while not sendChange:
                 data2 = self.data1.decode("utf-8")
                 ids_p = [int(id) for id in data2.split(' ')[1:-1]]
                 ids_p = ids_p[0:block_size*block_size]
                 for i in np.arange(len(ids_p)):
-                    if ids_p[i]!=-1 and ids_p[i]!=self.ids[i] and (ids_p[i] in self.idsUsesHeights) and (i not in considered_changes):
-                        print("Change counter increased")
-                        print("Triggering id is: {}".format(ids_p[i]))
-                        print("Original id is: {}".format(self.ids[i]))
-                        ids[i] = ids_p[i]
-                        considered_changes.add(i)
+                    if ids_p[i]!=-1 and ids_p[i]!=self.ids[i]:
+                        if (ids_p[i] in self.idsUsesHeights):
+                            #print("Change counter increased")
+                            #print("Triggering id is: {}".format(ids_p[i]))
+                            #print("Original id is: {}".format(self.ids[i]))
+                            ids[i] = ids_p[i]
+                            sendChange = True
+                        elif ids_p[i] == id_block and i not in self.genMachine.blocked:
+                            landUse = self.idsUsesHeights[self.ids[i]][0]
+                            height = self.idsUsesHeights[self.ids[i]][1]
+                            self.genMachine.blocked[i] = [landUse,height]
+                            print("Mask of blockes is now: {}".format(self.genMachine.blocked))
                 if self.bool_continue_GM: break
-            print("Ids selected are: {}".format(ids))
+            #print("Ids selected are: {}".format(ids))
             for element in ids:
                 self.ids[element] = ids[element]
-            print("Ids to be sent are: {}".format(ids))
+            #print("Ids to be sent are: {}".format(ids))
             "You send a new vector with land uses to the cityIO"
             self.grid_to_send = []
             self.grid_to_send_projection = []
@@ -288,15 +298,12 @@ class MainMachine(StateMachine):
                     self.grid_to_send.append((landUse, height))
                     self.grid_to_send_projection.append((landUse,0))
                     self.land_uses_from_interaction.append(landUse)
-            print("Land uses and heights to send is: {}".format(self.grid_to_send))
+            #print("Land uses and heights to send is: {}".format(self.grid_to_send))
             _, new_dictionary_rules_fitness = fitness_func(np.asarray(self.land_uses_from_interaction), create_set_rules(), self.genMachine.weights) #TODO: modify to centralize parameters
             post_indicators(self.table_name, new_dictionary_rules_fitness)
             self.H.update_geogrid_data(update_land_uses, grid_list=self.grid_to_send, dict_landUses=dict_landUses)
             self.H_projection.update_geogrid_data(update_land_uses, grid_list=self.grid_to_send_projection, dict_landUses=dict_landUses)
-            '''print("Press intro to continue or 'e' to continue running the genetic algorithm")
-            ch = input("['Intro','e']>>>")
-            if ch == "e":
-                break '''
+        print("EXITING INTERACTION")
     
 
     def continue_GM(self):
