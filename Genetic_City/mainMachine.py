@@ -57,6 +57,9 @@ class MainMachine(StateMachine):
     server_address = (ip, port)
     s.bind(server_address) # Bind the socket to the port
 
+    #Define mask for ids not to be modified
+    mask = [0]*(block_size*block_size)
+
     def read_aruco_check_play_pause(self):
         while not keyboard.is_pressed('t'):    
             self.data1, address = self.s.recvfrom(4096)
@@ -157,18 +160,18 @@ class MainMachine(StateMachine):
             print("Please interact with the table")
             considered_changes = set()
             ids = dict()
-            while(len(considered_changes)<2):
-                data2 = self.data1.decode("utf-8")
-                ids_p = [int(id) for id in data2.split(' ')[1:-1]]
-                ids_p = ids_p[0:block_size*block_size]
-                for i in np.arange(len(ids_p)):
-                    if ids_p[i]!=-1 and ids_p[i]!=self.ids[i] and (ids_p[i] in self.idsUsesHeights) and (i not in considered_changes):
-                        print("Change counter increased")
-                        print("Triggering id is: {}".format(ids_p[i]))
-                        print("Original id is: {}".format(self.ids[i]))
-                        ids[i] = ids_p[i]
-                        considered_changes.add(i)
-                if self.bool_continue_GM: break
+            #while(len(considered_changes)<2):
+            data2 = self.data1.decode("utf-8")
+            ids_p = [int(id) for id in data2.split(' ')[1:-1]]
+            ids_p = ids_p[0:block_size*block_size]
+            for i in np.arange(len(ids_p)):
+                if ids_p[i]!=-1 and ids_p[i]!=self.ids[i] and (ids_p[i] in self.idsUsesHeights): # and (i not in considered_changes): TODO: eliminate this comment asap
+                    print("Change counter increased")
+                    print("Triggering id is: {}".format(ids_p[i]))
+                    print("Original id is: {}".format(self.ids[i]))
+                    ids[i] = ids_p[i]
+                    # considered_changes.add(i)
+            if self.bool_continue_GM: break
             print("Ids selected are: {}".format(ids))
             for element in ids:
                 self.ids[element] = ids[element]
