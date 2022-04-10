@@ -31,7 +31,8 @@ class MainMachine(StateMachine):
     calibrate = computing_generations.to(calibrating)
     interact = calibrating.to(user_interacting)
     resume_genetic = user_interacting.to(computing_generations)
-    resume_interaction = computing_generations.to(user_interacting)
+    resume_calibrate = computing_generations.to(calibrating)
+    resume_interaction = calibrating.to(user_interacting)
 
     #Initialise the Genetic Machine
     genMachine = GeneticMachine()
@@ -61,7 +62,7 @@ class MainMachine(StateMachine):
             self.data1, address = self.s.recvfrom(4096)
             data2 = self.data1.decode("utf-8")
             ids_p = [int(id) for id in data2.split(' ')[1:-1]]
-            while ids_p[pos_play_pause] == -1:
+            if ids_p[pos_play_pause] == -1:
                 print("Id play pause equal to -1")
                 '''data1, address = self.s.recvfrom(4096)
                 data2 = data1.decode("utf-8")
@@ -118,11 +119,6 @@ class MainMachine(StateMachine):
                 self.H.update_geogrid_data(update_land_uses, grid_list= self.grid_to_send, dict_landUses=dict_landUses)
                 self.H_projection.update_geogrid_data(update_land_uses, grid_list= self.grid_to_send_projection, dict_landUses=dict_landUses)
                 post_indicators(self.table_name, indicators_to_send)
-                '''print("Press intro to continue")
-                print("Press 'e' to go and calibrate the table")
-                ch = input("['Intro','e']>>>")
-                if ch == "e":
-                    break'''
             self.generation +=1
         self.generation +=1
         music.pause_music()
@@ -157,16 +153,12 @@ class MainMachine(StateMachine):
 
     def on_interact(self):
         print("STARTING INTERACTION")
-        #while not keyboard.is_pressed('e'):
         while not self.bool_continue_GM:
             print("Please interact with the table")
             considered_changes = set()
             ids = dict()
             while(len(considered_changes)<2):
-                print("Reading data for interaction")
-                #data1, address = self.s.recvfrom(4096)
                 data2 = self.data1.decode("utf-8")
-                print("Data read")
                 ids_p = [int(id) for id in data2.split(' ')[1:-1]]
                 ids_p = ids_p[0:block_size*block_size]
                 for i in np.arange(len(ids_p)):
@@ -176,6 +168,7 @@ class MainMachine(StateMachine):
                         print("Original id is: {}".format(self.ids[i]))
                         ids[i] = ids_p[i]
                         considered_changes.add(i)
+                if self.bool_continue_GM: break
             print("Ids selected are: {}".format(ids))
             for element in ids:
                 self.ids[element] = ids[element]
@@ -195,15 +188,12 @@ class MainMachine(StateMachine):
             post_indicators(self.table_name, new_dictionary_rules_fitness)
             self.H.update_geogrid_data(update_land_uses, grid_list=self.grid_to_send, dict_landUses=dict_landUses)
             self.H_projection.update_geogrid_data(update_land_uses, grid_list=self.grid_to_send_projection, dict_landUses=dict_landUses)
-            '''print("Press intro to continue or 'e' to continue running the genetic algorithm")
-            ch = input("['Intro','e']>>>")
-            if ch == "e":
-                break '''
+        print("EXITING INTERACTION")
 
     def on_resume_genetic(self):
         print("RESUMING THE GENETIC ALGORITHM")
+        music.resume_music()
         self.genMachine.continue_generation(self.land_uses_from_interaction)
-        #while not keyboard.is_pressed('e'):
         while self.bool_continue_GM:
             print("Generation : ", self.generation)
             self.genMachine.compute_generation()
@@ -231,13 +221,36 @@ class MainMachine(StateMachine):
                 self.H.update_geogrid_data(update_land_uses, grid_list= self.grid_to_send, dict_landUses=dict_landUses)
                 self.H_projection.update_geogrid_data(update_land_uses, grid_list= self.grid_to_send_projection, dict_landUses=dict_landUses)
                 post_indicators(self.table_name, indicators_to_send)
-                '''print("Press intro to continue")
-                print("Press 'e' to go and calibrate the table")
-                ch = input("['Intro','e']>>>")
-                if ch == "e":
-                    break'''
             self.generation +=1
         self.generation +=1
+        music.pause_music()
+
+    def on_resume_calibrate(self):
+        print("STARTING CALIBRATION")
+        print("Calibration should be automatic. If blocked, try to move swap two pieces")
+        #data1, address = self.s.recvfrom(4096)
+        data2 = self.data1.decode("utf-8")
+        ids_p = [int(id) for id in data2.split(' ')[1:-1]]
+        ids_p = ids_p[0:block_size*block_size]
+        ids = [0]*len(ids_p)
+        set_recheck = set(np.arange(len(ids_p)))
+        while(len(set_recheck)>0):
+            i = set_recheck.pop()
+            if ids_p[i]!=-1:
+                ids[i] = ids_p[i]
+            else:
+                set_recheck.add(i)
+                #data1, address = self.s.recvfrom(4096)
+                data2 = self.data1.decode("utf-8")
+                ids_p = [int(id) for id in data2.split(' ')[1:-1]]
+                ids_p = ids_p[0:block_size*block_size]
+        print("Calibration completed.")
+        print("Ids selected are: {}".format(ids))
+        self.ids = ids.copy()
+        self.idsUsesHeights = dict()
+        for i in range(len(self.ids)):
+            self.idsUsesHeights[ids[i]] = self.grid_to_send[i]
+        print("Ids uses are: {}".format(self.idsUsesHeights))
 
     def on_resume_interaction(self):
         print("STARTING INTERACTION")
@@ -247,7 +260,6 @@ class MainMachine(StateMachine):
             considered_changes = set()
             ids = dict()
             while(len(considered_changes)<2):
-                #data1, address = self.s.recvfrom(4096)
                 data2 = self.data1.decode("utf-8")
                 ids_p = [int(id) for id in data2.split(' ')[1:-1]]
                 ids_p = ids_p[0:block_size*block_size]
@@ -258,6 +270,7 @@ class MainMachine(StateMachine):
                         print("Original id is: {}".format(self.ids[i]))
                         ids[i] = ids_p[i]
                         considered_changes.add(i)
+                if self.bool_continue_GM: break
             print("Ids selected are: {}".format(ids))
             for element in ids:
                 self.ids[element] = ids[element]
@@ -273,7 +286,7 @@ class MainMachine(StateMachine):
                     self.grid_to_send_projection.append((landUse,0))
                     self.land_uses_from_interaction.append(landUse)
             print("Land uses and heights to send is: {}".format(self.grid_to_send))
-            _, new_dictionary_rules_fitness = fitness_func(np.asarray(self.land_uses_from_interaction), create_set_rules()) #TODO: modify to centralize parameters
+            _, new_dictionary_rules_fitness = fitness_func(np.asarray(self.land_uses_from_interaction), create_set_rules(), self.genMachine.weights) #TODO: modify to centralize parameters
             post_indicators(self.table_name, new_dictionary_rules_fitness)
             self.H.update_geogrid_data(update_land_uses, grid_list=self.grid_to_send, dict_landUses=dict_landUses)
             self.H_projection.update_geogrid_data(update_land_uses, grid_list=self.grid_to_send_projection, dict_landUses=dict_landUses)

@@ -44,12 +44,18 @@ mainMachine.start()
 #START THE CALIBRATION OF THE TABLE
 mainMachine.calibrate()
 
-while not keyboard.is_pressed('t'):
-    #BEGIN INTERACTION WITH PIECES
-    mainMachine.interact()
+#BEGIN INTERACTION WITH PIECES
+mainMachine.interact()
 
+while not keyboard.is_pressed('t'):
     #CONTINUE GENETIC ALGORITHM
-    mainMachine.resume()
+    mainMachine.resume_genetic()
+
+    #RE-CALIBRATE TABLE
+    mainMachine.resume_calibrate()
+
+    #CONTINUE INTERACTION
+    mainMachine.resume_interaction()
 
 '''# Getting the best solution after iterating finishing all generations.
 #At first, the fitness is calculated for each solution in the final generation.
