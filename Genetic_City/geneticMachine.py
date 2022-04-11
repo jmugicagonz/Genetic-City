@@ -34,8 +34,6 @@ class GeneticMachine():
 
         # Define dictionary to store those values that should not be touched
         self.blocked = dict()
-        # Mask for those blocks that should not be touched
-        self.mask = [0]*(block_size*block_size)
 
     def compute_generation(self):
         if self.bool_weights:
