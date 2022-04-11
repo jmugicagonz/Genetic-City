@@ -1,9 +1,9 @@
 acces: 1
 green_amount: 1
-green_width: 60
-div_h: 30
-div_o: 30
+green_width: 50
+div_h: 1
+div_o: 1
 h_o_walk: 1
 acc_p: 1
-h_o_balance: 1
+h_o_balance: 50
 peop_fit: 1

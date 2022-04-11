@@ -23,7 +23,7 @@ crossover_value = .9 # The point at which crossover takes place between two pare
 
 "City Parameters"
 block_size = 7 # Size of the area to optimise (square dimension)
-building_types = 3 # [1 = Park, 2 = Office, 3 = Residential]
+building_types = 3 # [1 = Campus, 2 = Industry, 3 = Residence]
 cmap = ListedColormap(["forestgreen","lightcoral","lightgray","dimgray"])
 
 "Values to define land uses and initialise the connection to the table"
@@ -49,7 +49,7 @@ path_to_code = "C:/Users/adminlocal/Documents/WorkspacesPython/Genetic-City/Gene
     1, ]) #10: distances_homes_offices_parks'''
 
 "Population/Area parameters for rules"
-min_num_people_to_fit = 5700 #Minimum number of people to fit in the space
+min_num_people_to_fit = 3000 #Minimum number of people to fit in the space
 residence_density = 100 #people/house_node
 office_density = 150 #people/office_node
 park_space_per_person = 4 #gren space ideally needed per person, in m2, with each node being 625m2
@@ -91,6 +91,14 @@ save_data = False
 '''PARAMETERS ARUCO TAGS'''
 id_play = 227 # Id of the Aruco tag representing the play buttong
 id_pause = 128 # Id of the Aruco tag representing the pause button
+<<<<<<< HEAD
 id_block = 12 # Id of the Aruco tag representing the block cell
 pos_play_pause = 49 # Position of the Aruco tag for the play/pause button
 
+=======
+id_block = 12 # Id of the Aruco tag representing the block button
+id_campus = 3 # Id of the Aruco tag representing the campus button
+id_industry = 8 # Id of the Aruco tag representing the industry button
+id_residence = 19 # Id of the Aruco tag representing the residence button
+pos_play_pause = 49 # Position of the Aruco tag for the play/pause button
+>>>>>>> c7dbb504687dc3862f32bee15490f75b0626535b

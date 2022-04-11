@@ -89,20 +89,19 @@ class MainMachine(StateMachine):
         # Start the thread
         self.th.start()
         print("WHENEVER YOU ARE READY, PLAY THE GENETIC ALGORITHM")
-        '''while not self.bool_continue_GM:
+        while not self.bool_continue_GM:
             print("Waiting to start. Replace the pause button by the play")
-            time.sleep(1)'''
+            time.sleep(1)
         print("STARTING GENETIC ALGORITHM")
         music.play_music()
-        #while not keyboard.is_pressed('e'):
-        '''while self.bool_continue_GM:'''
         ref_indicators= self.ref_ind
-        while True:
+        while self.bool_continue_GM:
+        #while True:
             print("Generation : ", self.generation)
             self.genMachine.compute_generation()
             if self.generation%5 == 0: #Send values each five generations
                 max_height = int((self.generation+1)*2)
-                if max_height>500: max_height=500
+                if max_height>250: max_height=250
                 landUses_to_send = self.genMachine.population_matrix[0, :]
                 indicators_to_send = self.genMachine.list_of_dictionaries_rules[0]
                 print("Indicators to send are: {}".format(indicators_to_send))
@@ -113,16 +112,16 @@ class MainMachine(StateMachine):
                     randomTall = np.random.uniform(0.0,1.0)
                     randomH = np.random.randint(0.0,float(max_height))
                     if landUses_to_send[i] == 2: 
-                        if randomTall >= 0.9: height = 4*randomH
-                        elif randomTall >= 0.5: height = 2*randomH
+                        if randomTall >= 0.9: height = 2*randomH
+                        elif randomTall >= 0.5: height = randomH
                         else: height = randomH
                     elif landUses_to_send[i] == 3: 
-                        if randomTall >= 0.8: height = 2*randomH
-                        elif randomTall >= 0.5: height = randomH
-                        else: height = int(0.5*randomH)
+                        if randomTall >= 0.8: height = randomH
+                        elif randomTall >= 0.5: height = int(0.5*randomH)
+                        else: height = int(0.25*randomH)
                     elif landUses_to_send[i] == 1: height = 0
-                    self.grid_to_send[i] = (landUses_to_send[i],height)
-                    self.grid_to_send_projection[i] = (landUses_to_send[i],0)
+                    self.grid_to_send[i] = [landUses_to_send[i],height]
+                    self.grid_to_send_projection[i] = [landUses_to_send[i],0]
                 self.H.update_geogrid_data(update_land_uses, grid_list= self.grid_to_send, dict_landUses=dict_landUses)
                 self.H_projection.update_geogrid_data(update_land_uses, grid_list= self.grid_to_send_projection, dict_landUses=dict_landUses)
                 ref_indicators = post_indicators(self.table_name, indicators_to_send, ref_indicators_init)
@@ -183,6 +182,16 @@ class MainMachine(StateMachine):
                             height = self.idsUsesHeights[self.ids[i]][1]
                             self.genMachine.blocked[i] = [landUse,height]
                             print("Mask of blockes is now: {}".format(self.genMachine.blocked))
+                        elif ids_p[i] == id_campus:
+                            self.idsUsesHeights[self.ids[i]][0] = 1
+                            self.idsUsesHeights[self.ids[i]][1] = 0
+                            sendChange = True
+                        elif ids_p[i] == id_industry:
+                            self.idsUsesHeights[self.ids[i]][0] = 2
+                            sendChange = True
+                        elif ids_p[i] == id_residence:
+                            self.idsUsesHeights[self.ids[i]][0] = 3
+                            sendChange = True
                 if self.bool_continue_GM: break
             #print("Ids selected are: {}".format(ids))
             for element in ids:
@@ -215,7 +224,7 @@ class MainMachine(StateMachine):
             self.genMachine.compute_generation()
             if self.generation%5 == 0: # Send values each five generations
                 max_height = int((self.generation+1)*2)
-                if max_height>500: max_height=500
+                if max_height>250: max_height=250
                 landUses_to_send = self.genMachine.population_matrix[0, :]
                 indicators_to_send = self.genMachine.list_of_dictionaries_rules[0]
                 print("Indicators to send are: {}".format(indicators_to_send))
@@ -228,16 +237,16 @@ class MainMachine(StateMachine):
                         randomTall = np.random.uniform(0.0,1.0)
                         randomH = np.random.randint(0.0,float(max_height))
                         if landUses_to_send[i] == 2: 
-                            if randomTall >= 0.9: height = 4*randomH
-                            elif randomTall >= 0.5: height = 2*randomH
-                            else: height = randomH
-                        elif landUses_to_send[i] == 3: 
-                            if randomTall >= 0.8: height = 2*randomH
+                            if randomTall >= 0.9: height = 2*randomH
                             elif randomTall >= 0.5: height = randomH
                             else: height = int(0.5*randomH)
+                        elif landUses_to_send[i] == 3: 
+                            if randomTall >= 0.8: height = randomH
+                            elif randomTall >= 0.5: height = int(0.5*randomH)
+                            else: height = int(0.25*randomH)
                         elif landUses_to_send[i] == 1: height = 0
-                    self.grid_to_send[i] = (landUses_to_send[i],height)
-                    self.grid_to_send_projection[i] = (landUses_to_send[i],0)
+                    self.grid_to_send[i] = [landUses_to_send[i],height]
+                    self.grid_to_send_projection[i] = [landUses_to_send[i],0]
                 self.H.update_geogrid_data(update_land_uses, grid_list= self.grid_to_send, dict_landUses=dict_landUses)
                 self.H_projection.update_geogrid_data(update_land_uses, grid_list= self.grid_to_send_projection, dict_landUses=dict_landUses)
                 ref_indicators = post_indicators(self.table_name, indicators_to_send, ref_indicators_init)
@@ -300,6 +309,16 @@ class MainMachine(StateMachine):
                             height = self.idsUsesHeights[self.ids[i]][1]
                             self.genMachine.blocked[i] = [landUse,height]
                             print("Mask of blockes is now: {}".format(self.genMachine.blocked))
+                        elif ids_p[i] == id_campus:
+                            self.idsUsesHeights[self.ids[i]][0] = 1
+                            self.idsUsesHeights[self.ids[i]][1] = 0
+                            sendChange = True
+                        elif ids_p[i] == id_industry:
+                            self.idsUsesHeights[self.ids[i]][0] = 2
+                            sendChange = True
+                        elif ids_p[i] == id_residence:
+                            self.idsUsesHeights[self.ids[i]][0] = 3
+                            sendChange = True
                 if self.bool_continue_GM: break
             #print("Ids selected are: {}".format(ids))
             for element in ids:
