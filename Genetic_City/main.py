@@ -47,6 +47,7 @@ mainMachine.calibrate()
 #BEGIN INTERACTION WITH PIECES
 mainMachine.interact()
 
+
 while not keyboard.is_pressed('t'):
     #CONTINUE GENETIC ALGORITHM
     mainMachine.resume_genetic()

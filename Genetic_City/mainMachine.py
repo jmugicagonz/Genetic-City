@@ -85,14 +85,13 @@ class MainMachine(StateMachine):
         # Start the thread
         self.th.start()
         print("WHENEVER YOU ARE READY, PLAY THE GENETIC ALGORITHM")
-        '''while not self.bool_continue_GM:
+        while not self.bool_continue_GM:
             print("Waiting to start. Replace the pause button by the play")
             time.sleep(1)
-        print("STARTING GENETIC ALGORITHM")'''
+        print("STARTING GENETIC ALGORITHM")
         music.play_music()
         #while not keyboard.is_pressed('e'):
-        '''while self.bool_continue_GM:'''
-        while True:
+        while self.bool_continue_GM:
             print("Generation : ", self.generation)
             self.genMachine.compute_generation()
             if self.generation%5 == 0: #Send values each five generations
@@ -149,7 +148,7 @@ class MainMachine(StateMachine):
         self.ids = ids.copy()
         self.idsUsesHeights = dict()
         for i in range(len(self.ids)):
-            self.idsUsesHeights[ids[i]] = self.grid_to_send[i]
+            self.idsUsesHeights[self.ids[i]] = self.grid_to_send[i]
         print("Ids uses are: {}".format(self.idsUsesHeights))
 
     def on_interact(self): #TODO: copy this part in resume interaction
@@ -259,9 +258,10 @@ class MainMachine(StateMachine):
         for i in np.arange(len(ids)):
             if i not in self.genMachine.blocked:
                 self.ids[i] = ids[i]
+        print("Self ids are: {}".format(self.ids))
         self.idsUsesHeights = dict()
         for i in range(len(self.ids)):
-            self.idsUsesHeights[ids[i]] = self.grid_to_send[i]
+            self.idsUsesHeights[self.ids[i]] = self.grid_to_send[i]
         print("Ids uses are: {}".format(self.idsUsesHeights))
 
     def on_resume_interaction(self):
