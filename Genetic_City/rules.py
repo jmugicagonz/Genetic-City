@@ -86,9 +86,9 @@ def div_h(solution,unique,counts,lists_of_distances):
     percentage_large = counter_large/len(houses)
     percentage_medium = counter_medium/len(houses)
     percentage_small = 1 - (percentage_large+percentage_medium)
-    case_dict_h = [percentage_small, percentage_medium, percentage_large]
-    fitness = manhattan_dist_diversity(case_dict_h, target_dict_housing)
-    return fitness*100
+    fitness = nd_small_house.pdf(percentage_small) + nd_medium_house.pdf(percentage_medium) + nd_large_house.pdf(percentage_large)
+    fitness = coef_diversity_of_housing * 1.5 * fitness
+    return fitness
 
 "5"
 def div_o(solution,unique,counts,lists_of_distances):
@@ -119,9 +119,9 @@ def div_o(solution,unique,counts,lists_of_distances):
     percentage_large = counter_large/len(offices)
     percentage_medium = counter_medium/len(offices)
     percentage_small = 1 - (percentage_large+percentage_medium)
-    case_dict_o = [percentage_small, percentage_medium, percentage_large]
-    fitness = manhattan_dist_diversity(case_dict_o, target_dict_office)
-    return fitness*100
+    fitness = nd_small_office.pdf(percentage_small) + nd_medium_office.pdf(percentage_medium) + nd_large_office.pdf(percentage_large)
+    fitness = coef_diversity_of_housing * 1.5 * fitness
+    return fitness
 
 "6"
 "Takes the closest office to each residence, without taking in account if people will fit in those offices (like a vertical no limit density)"

@@ -44,7 +44,7 @@ mainMachine.start()
 #START THE CALIBRATION OF THE TABLE
 mainMachine.calibrate()
 
-#BEGIN INTERACTION WITH PIECES
+#BEGIN INTERACTION WITH PIECES  
 mainMachine.interact()
 
 

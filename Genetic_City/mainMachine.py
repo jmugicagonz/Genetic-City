@@ -57,6 +57,10 @@ class MainMachine(StateMachine):
     server_address = (ip, port)
     s.bind(server_address) # Bind the socket to the port
 
+    # Initialise reference indicators
+    ref_ind = [0]*9
+
+
     def read_aruco_check_play_pause(self):
         while not keyboard.is_pressed('t'):    
             self.data1, address = self.s.recvfrom(4096)
@@ -92,6 +96,7 @@ class MainMachine(StateMachine):
         music.play_music()
         #while not keyboard.is_pressed('e'):
         '''while self.bool_continue_GM:'''
+        ref_indicators= self.ref_ind
         while True:
             print("Generation : ", self.generation)
             self.genMachine.compute_generation()
@@ -101,6 +106,7 @@ class MainMachine(StateMachine):
                 landUses_to_send = self.genMachine.population_matrix[0, :]
                 indicators_to_send = self.genMachine.list_of_dictionaries_rules[0]
                 print("Indicators to send are: {}".format(indicators_to_send))
+                ref_indicators_init = ref_indicators
                 self.grid_to_send = [(0,0) for _ in np.arange(len(landUses_to_send))]
                 self.grid_to_send_projection = [(0,0) for _ in np.arange(len(landUses_to_send))]
                 for i in np.arange(len(landUses_to_send)):
@@ -119,7 +125,7 @@ class MainMachine(StateMachine):
                     self.grid_to_send_projection[i] = (landUses_to_send[i],0)
                 self.H.update_geogrid_data(update_land_uses, grid_list= self.grid_to_send, dict_landUses=dict_landUses)
                 self.H_projection.update_geogrid_data(update_land_uses, grid_list= self.grid_to_send_projection, dict_landUses=dict_landUses)
-                post_indicators(self.table_name, indicators_to_send)
+                ref_indicators = post_indicators(self.table_name, indicators_to_send, ref_indicators_init)
             self.generation +=1
         self.generation +=1
         music.pause_music()
@@ -154,10 +160,12 @@ class MainMachine(StateMachine):
 
     def on_interact(self): #TODO: copy this part in resume interaction
         print("STARTING INTERACTION")
+        ref_indicators= self.ref_ind
         while not self.bool_continue_GM:
             print("Please interact with the table")
             sendChange = False
             ids = dict()
+            ref_indicators_init = ref_indicators
             while not sendChange:
                 data2 = self.data1.decode("utf-8")
                 ids_p = [int(id) for id in data2.split(' ')[1:-1]]
@@ -192,7 +200,7 @@ class MainMachine(StateMachine):
                     self.land_uses_from_interaction.append(landUse)
             #print("Land uses and heights to send is: {}".format(self.grid_to_send))
             _, new_dictionary_rules_fitness = fitness_func(np.asarray(self.land_uses_from_interaction), create_set_rules(), self.genMachine.weights) #TODO: modify to centralize parameters
-            post_indicators(self.table_name, new_dictionary_rules_fitness)
+            ref_indicators = post_indicators(self.table_name, new_dictionary_rules_fitness, ref_indicators_init)
             self.H.update_geogrid_data(update_land_uses, grid_list=self.grid_to_send, dict_landUses=dict_landUses)
             self.H_projection.update_geogrid_data(update_land_uses, grid_list=self.grid_to_send_projection, dict_landUses=dict_landUses)
         print("EXITING INTERACTION")
@@ -201,6 +209,7 @@ class MainMachine(StateMachine):
         print("RESUMING THE GENETIC ALGORITHM")
         music.resume_music()
         self.genMachine.continue_generation(self.land_uses_from_interaction)
+        ref_indicators = self.ref_ind
         while self.bool_continue_GM:
             print("Generation : ", self.generation)
             self.genMachine.compute_generation()
@@ -210,6 +219,7 @@ class MainMachine(StateMachine):
                 landUses_to_send = self.genMachine.population_matrix[0, :]
                 indicators_to_send = self.genMachine.list_of_dictionaries_rules[0]
                 print("Indicators to send are: {}".format(indicators_to_send))
+                ref_indicators_init = ref_indicators
                 #self.grid_to_send = [(0,0) for _ in np.arange(len(landUses_to_send))]
                 for i in np.arange(len(landUses_to_send)):
                     if i in self.genMachine.blocked:
@@ -230,7 +240,7 @@ class MainMachine(StateMachine):
                     self.grid_to_send_projection[i] = (landUses_to_send[i],0)
                 self.H.update_geogrid_data(update_land_uses, grid_list= self.grid_to_send, dict_landUses=dict_landUses)
                 self.H_projection.update_geogrid_data(update_land_uses, grid_list= self.grid_to_send_projection, dict_landUses=dict_landUses)
-                post_indicators(self.table_name, indicators_to_send)
+                ref_indicators = post_indicators(self.table_name, indicators_to_send, ref_indicators_init)
             self.generation +=1
         self.generation +=1
         music.pause_music()
@@ -267,10 +277,12 @@ class MainMachine(StateMachine):
 
     def on_resume_interaction(self):
         print("STARTING INTERACTION")
+        ref_indicators = self.ref_ind
         while not self.bool_continue_GM:
             print("Please interact with the table")
             sendChange = False
             ids = dict()
+            ref_indicators_init=ref_indicators
             while not sendChange:
                 data2 = self.data1.decode("utf-8")
                 ids_p = [int(id) for id in data2.split(' ')[1:-1]]
@@ -305,7 +317,7 @@ class MainMachine(StateMachine):
                     self.land_uses_from_interaction.append(landUse)
             #print("Land uses and heights to send is: {}".format(self.grid_to_send))
             _, new_dictionary_rules_fitness = fitness_func(np.asarray(self.land_uses_from_interaction), create_set_rules(), self.genMachine.weights) #TODO: modify to centralize parameters
-            post_indicators(self.table_name, new_dictionary_rules_fitness)
+            ref_indicators = post_indicators(self.table_name, new_dictionary_rules_fitness, ref_indicators_init)
             self.H.update_geogrid_data(update_land_uses, grid_list=self.grid_to_send, dict_landUses=dict_landUses)
             self.H_projection.update_geogrid_data(update_land_uses, grid_list=self.grid_to_send_projection, dict_landUses=dict_landUses)
         print("EXITING INTERACTION")
