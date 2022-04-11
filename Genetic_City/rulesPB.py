@@ -13,6 +13,7 @@ def acces(solution,unique,counts,lists_of_distances):
     min_distances_accesibility_office = np.minimum(lists_of_distances[2],lists_of_distances[3])
     mean_of_all_distances = (2*np.mean(min_distances_accesibility_office) + np.mean(min_distances_accesibility_home))/3
     fitness = 1/mean_of_all_distances
+    print ('accesibility',fitness)
     return fitness*coef_accessibility
 #The fitness function will return a greater value if number of parks increases. Should converge into more parks.
 
@@ -22,6 +23,7 @@ def green_amount(solution,unique,counts,lists_of_distances):
     sq_meters_of_parks = len(np.where(solution==1))*625
     if(sq_meters_of_parks>=green_sq_meters_people_living): return 100
     fitness = sq_meters_of_parks/green_sq_meters_people_living*100
+    print ('green amount', fitness)
     return fitness
 
 "3"
@@ -46,15 +48,15 @@ def green_width(solution,unique,counts,lists_of_distances):
             new_res_dict[tup1] |= res_dict.get(tup2)
         #Now we will prize those nodes being connected to multiple other nodes
         fitness += sum(pow(len(cluster),2) for cluster in new_res_dict.values() if len(cluster)>1) ####np.exp(len(cluster)-1)
-        corners = 4*pow(3,2)
-        ideal_park_size = int(np.sqrt(len(parks)))
-        edge_rows_and_columns = 4*(ideal_park_size-2)*pow(5,2)
-        inside = (ideal_park_size*ideal_park_size-4*ideal_park_size)*pow(8,2)
-        max_green_space_balance_width = corners+edge_rows_and_columns+inside
-        coef_green_space_balance_width = 2/max_green_space_balance_width*100
-        fitness = coef_green_space_balance_width*fitness
-    if (fitness >= 100): return 100
-    elif (fitness < 0): return 0
+    corners = 4*pow(3,2)
+    ideal_park_size = int(np.sqrt(len(parks)))
+    edge_rows_and_columns = 4*(ideal_park_size-2)*pow(5,2)
+    inside = (ideal_park_size*ideal_park_size-4*ideal_park_size)*pow(8,2)
+    max_green_space_balance_width = corners+edge_rows_and_columns+inside
+    coef_green_space_balance_width = 2/max_green_space_balance_width*100
+    fitness = coef_green_space_balance_width*fitness
+    if (fitness>=100): return 100
+    print ('green width', fitness)
     return fitness
 
 "4"    
@@ -88,6 +90,7 @@ def div_h(solution,unique,counts,lists_of_distances):
     percentage_small = 1 - (percentage_large+percentage_medium)
     case_dict_h = [percentage_small, percentage_medium, percentage_large]
     fitness = manhattan_dist_diversity(case_dict_h, target_dict_housing)
+    print ('div_h', fitness)
     return fitness*100
 
 "5"
@@ -119,15 +122,18 @@ def div_o(solution,unique,counts,lists_of_distances):
     percentage_large = counter_large/len(offices)
     percentage_medium = counter_medium/len(offices)
     percentage_small = 1 - (percentage_large+percentage_medium)
-    case_dict_o = [percentage_small, percentage_medium, percentage_large]
-    fitness = manhattan_dist_diversity(case_dict_o, target_dict_office)
-    return fitness*100
+    fitness = nd_small_office.pdf(percentage_small)+nd_medium_office.pdf(percentage_medium)+nd_large_office.pdf(percentage_large)
+    fitness *= 1.5
+    if(fitness>=100): return 100
+    print ('div_o', fitness)
+    return coef_diversity_of_housing*fitness
 
 "6"
 "Takes the closest office to each residence, without taking in account if people will fit in those offices (like a vertical no limit density)"
 def h_o_walk(solution,unique,counts,lists_of_distances):
     fitness = 0
     fitness=1/(np.mean(lists_of_distances[0]))
+    print ('h_o_walk', fitness)
     return coef_house_office_walkable*fitness
 
 "7"
@@ -136,6 +142,7 @@ def acc_p(solution,unique,counts,lists_of_distances):
     fitness = 0
     mean_of_all_distances = (2*np.mean(lists_of_distances[1]) + np.mean(lists_of_distances[3]))/3
     fitness = 1/mean_of_all_distances
+    print ('acc_p', fitness)
     return fitness*coef_access_to_parks
 
 
@@ -146,6 +153,7 @@ def h_o_balance(solution,unique,counts,lists_of_distances):
     nb_people_working = len(np.where(solution==2))*office_density
     if (nb_people_living<=nb_people_working): fitness=nb_people_living/nb_people_working*100
     else: fitness=nb_people_working/nb_people_living*100
+    print ('h_o_balance', fitness)
     return fitness
 
 "9"
