@@ -91,6 +91,7 @@ class MainMachine(StateMachine):
         print("STARTING GENETIC ALGORITHM")
         music.play_music()
         while self.bool_continue_GM:
+        #while True:
             print("Generation : ", self.generation)
             self.genMachine.compute_generation()
             if self.generation%5 == 0: #Send values each five generations
