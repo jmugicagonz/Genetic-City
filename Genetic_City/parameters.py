@@ -49,7 +49,7 @@ path_to_code = "C:/Users/adminlocal/Documents/WorkspacesPython/Genetic-City/Gene
     1, ]) #10: distances_homes_offices_parks'''
 
 "Population/Area parameters for rules"
-min_num_people_to_fit = 5700 #Minimum number of people to fit in the space
+min_num_people_to_fit = 3000 #Minimum number of people to fit in the space
 residence_density = 100 #people/house_node
 office_density = 150 #people/office_node
 park_space_per_person = 4 #gren space ideally needed per person, in m2, with each node being 625m2
