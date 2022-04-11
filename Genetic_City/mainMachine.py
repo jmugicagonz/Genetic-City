@@ -85,13 +85,13 @@ class MainMachine(StateMachine):
         # Start the thread
         self.th.start()
         print("WHENEVER YOU ARE READY, PLAY THE GENETIC ALGORITHM")
-        '''while not self.bool_continue_GM:
+        while not self.bool_continue_GM:
             print("Waiting to start. Replace the pause button by the play")
-            time.sleep(1)'''
+            time.sleep(1)
         print("STARTING GENETIC ALGORITHM")
         music.play_music()
-        '''while self.bool_continue_GM:'''
-        while True:
+        while self.bool_continue_GM:
+        #while True:
             print("Generation : ", self.generation)
             self.genMachine.compute_generation()
             if self.generation%5 == 0: #Send values each five generations

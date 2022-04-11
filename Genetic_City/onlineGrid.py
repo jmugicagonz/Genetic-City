@@ -9,7 +9,7 @@ def update_land_uses(geogrid_data, grid_list=[0], dict_landUses={0: '0'}):
         cell['height'] = grid_list[cell['id']][1]
 
     headers = {'Content-Type': 'application/json'}
-    #r = requests.post('http://127.0.0.1:1234/landuse', data = json.dumps(geogrid_data), headers=headers)
+    r = requests.post('http://127.0.0.1:1234/landuse', data = json.dumps(geogrid_data), headers=headers)
     # ipdb.set_trace() 
     return geogrid_data
 
@@ -21,6 +21,6 @@ def post_indicators(table_name, dict_of_indicators):
     print("Indicators are: {}".format(indicators))
     
     r = requests.post(url+'/indicators', data = json.dumps(indicators), headers=headers)
-    #r = requests.post('http://127.0.0.1:1234/indicator', data = json.dumps(indicators), headers=headers)
+    r = requests.post('http://127.0.0.1:1234/indicator', data = json.dumps(indicators), headers=headers)
 
     # ipdb.set_trace()
