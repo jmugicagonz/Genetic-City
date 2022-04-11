@@ -113,8 +113,8 @@ class MainMachine(StateMachine):
                         elif randomTall >= 0.5: height = randomH
                         else: height = int(0.5*randomH)
                     elif landUses_to_send[i] == 1: height = 0
-                    self.grid_to_send[i] = (landUses_to_send[i],height)
-                    self.grid_to_send_projection[i] = (landUses_to_send[i],0)
+                    self.grid_to_send[i] = [landUses_to_send[i],height]
+                    self.grid_to_send_projection[i] = [landUses_to_send[i],0]
                 self.H.update_geogrid_data(update_land_uses, grid_list= self.grid_to_send, dict_landUses=dict_landUses)
                 self.H_projection.update_geogrid_data(update_land_uses, grid_list= self.grid_to_send_projection, dict_landUses=dict_landUses)
                 post_indicators(self.table_name, indicators_to_send)
@@ -175,10 +175,14 @@ class MainMachine(StateMachine):
                             print("Mask of blockes is now: {}".format(self.genMachine.blocked))
                         elif ids_p[i] == id_campus:
                             self.idsUsesHeights[self.ids[i]][0] = 1
+                            self.idsUsesHeights[self.ids[i]][1] = 0
+                            sendChange = True
                         elif ids_p[i] == id_industry:
                             self.idsUsesHeights[self.ids[i]][0] = 2
+                            sendChange = True
                         elif ids_p[i] == id_residence:
                             self.idsUsesHeights[self.ids[i]][0] = 3
+                            sendChange = True
                 if self.bool_continue_GM: break
             #print("Ids selected are: {}".format(ids))
             for element in ids:
@@ -230,8 +234,8 @@ class MainMachine(StateMachine):
                             elif randomTall >= 0.5: height = randomH
                             else: height = int(0.5*randomH)
                         elif landUses_to_send[i] == 1: height = 0
-                    self.grid_to_send[i] = (landUses_to_send[i],height)
-                    self.grid_to_send_projection[i] = (landUses_to_send[i],0)
+                    self.grid_to_send[i] = [landUses_to_send[i],height]
+                    self.grid_to_send_projection[i] = [landUses_to_send[i],0]
                 self.H.update_geogrid_data(update_land_uses, grid_list= self.grid_to_send, dict_landUses=dict_landUses)
                 self.H_projection.update_geogrid_data(update_land_uses, grid_list= self.grid_to_send_projection, dict_landUses=dict_landUses)
                 post_indicators(self.table_name, indicators_to_send)
@@ -294,10 +298,14 @@ class MainMachine(StateMachine):
                             print("Mask of blockes is now: {}".format(self.genMachine.blocked))
                         elif ids_p[i] == id_campus:
                             self.idsUsesHeights[self.ids[i]][0] = 1
+                            self.idsUsesHeights[self.ids[i]][1] = 0
+                            sendChange = True
                         elif ids_p[i] == id_industry:
                             self.idsUsesHeights[self.ids[i]][0] = 2
+                            sendChange = True
                         elif ids_p[i] == id_residence:
                             self.idsUsesHeights[self.ids[i]][0] = 3
+                            sendChange = True
                 if self.bool_continue_GM: break
             #print("Ids selected are: {}".format(ids))
             for element in ids:
