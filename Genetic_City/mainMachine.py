@@ -237,6 +237,7 @@ class MainMachine(StateMachine):
     def on_resume_calibrate(self): #TODO: refine calibration to take in account mask
         print("STARTING CALIBRATION")
         print("Calibration should be automatic. If blocked, try to move swap two pieces")
+        #data1, address = self.s.recvfrom(4096)
         data2 = self.data1.decode("utf-8")
         ids_p = [int(id) for id in data2.split(' ')[1:-1]]
         ids_p = ids_p[0:block_size*block_size]
