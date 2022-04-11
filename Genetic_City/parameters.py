@@ -23,7 +23,7 @@ crossover_value = .9 # The point at which crossover takes place between two pare
 
 "City Parameters"
 block_size = 7 # Size of the area to optimise (square dimension)
-building_types = 3 # [1 = Park, 2 = Office, 3 = Residential]
+building_types = 3 # [1 = Campus, 2 = Industry, 3 = Residence]
 cmap = ListedColormap(["forestgreen","lightcoral","lightgray","dimgray"])
 
 "Values to define land uses and initialise the connection to the table"
@@ -89,5 +89,7 @@ save_data = False
 '''PARAMETERS ARUCO TAGS'''
 id_play = 227 # Id of the Aruco tag representing the play buttong
 id_pause = 128 # Id of the Aruco tag representing the pause button
-id_block = 12 # Id of the Aruco tag representing the block cell
+id_block = 3
+id_industry = 8
+id_residence = 19
 pos_play_pause = 49 # Position of the Aruco tag for the play/pause button

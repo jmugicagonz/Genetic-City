@@ -173,6 +173,12 @@ class MainMachine(StateMachine):
                             height = self.idsUsesHeights[self.ids[i]][1]
                             self.genMachine.blocked[i] = [landUse,height]
                             print("Mask of blockes is now: {}".format(self.genMachine.blocked))
+                        elif ids_p[i] == id_campus:
+                            self.idsUsesHeights[self.ids[i]][0] = 1
+                        elif ids_p[i] == id_industry:
+                            self.idsUsesHeights[self.ids[i]][0] = 2
+                        elif ids_p[i] == id_residence:
+                            self.idsUsesHeights[self.ids[i]][0] = 3
                 if self.bool_continue_GM: break
             #print("Ids selected are: {}".format(ids))
             for element in ids:
@@ -286,6 +292,12 @@ class MainMachine(StateMachine):
                             height = self.idsUsesHeights[self.ids[i]][1]
                             self.genMachine.blocked[i] = [landUse,height]
                             print("Mask of blockes is now: {}".format(self.genMachine.blocked))
+                        elif ids_p[i] == id_campus:
+                            self.idsUsesHeights[self.ids[i]][0] = 1
+                        elif ids_p[i] == id_industry:
+                            self.idsUsesHeights[self.ids[i]][0] = 2
+                        elif ids_p[i] == id_residence:
+                            self.idsUsesHeights[self.ids[i]][0] = 3
                 if self.bool_continue_GM: break
             #print("Ids selected are: {}".format(ids))
             for element in ids:
