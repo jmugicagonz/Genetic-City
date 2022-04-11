@@ -90,7 +90,6 @@ class MainMachine(StateMachine):
             time.sleep(1)
         print("STARTING GENETIC ALGORITHM")
         music.play_music()
-        #while not keyboard.is_pressed('e'):
         while self.bool_continue_GM:
             print("Generation : ", self.generation)
             self.genMachine.compute_generation()
