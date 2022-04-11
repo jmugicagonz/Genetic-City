@@ -8,12 +8,15 @@ from initFunctions import *  # Import initial calculations
 "Refers to things that should be closer to the road. Office +2, Housing +1, Park + 0"
 def acces(solution,unique,counts,lists_of_distances):
     fitness = 0
-    #The followed strategy computs the minimum distance from each ammenity to any different ammenity, as roads are now separating amenities.
+    #The followeing strategy computes the minimum distance from each ammenity to any different ammenity, as roads are now separating amenities.
     min_distances_accesibility_home = np.minimum(lists_of_distances[0],lists_of_distances[1])
     min_distances_accesibility_office = np.minimum(lists_of_distances[2],lists_of_distances[3])
     mean_of_all_distances = (2*np.mean(min_distances_accesibility_office) + np.mean(min_distances_accesibility_home))/3
     fitness = 1/mean_of_all_distances
-    return fitness*coef_accessibility
+    fitness = fitness * coef_accessibility
+    if (fitness<=0): return 0
+    if (fitness>=100): return 100
+    return fitness
 #The fitness function will return a greater value if number of parks increases. Should converge into more parks.
 
 "2"
@@ -22,6 +25,8 @@ def green_amount(solution,unique,counts,lists_of_distances):
     sq_meters_of_parks = len(np.where(solution==1))*625
     if(sq_meters_of_parks>=green_sq_meters_people_living): return 100
     fitness = sq_meters_of_parks/green_sq_meters_people_living*100
+    if (fitness<=0): return 0
+    if (fitness>=100): return 100
     return fitness
 
 "3"
@@ -53,6 +58,7 @@ def green_width(solution,unique,counts,lists_of_distances):
     max_green_space_balance_width = corners+edge_rows_and_columns+inside
     coef_green_space_balance_width = 2/max_green_space_balance_width*100
     fitness = coef_green_space_balance_width*fitness
+    if (fitness<=0): return 0
     if (fitness>=100): return 100
     return fitness
 
@@ -86,9 +92,11 @@ def div_h(solution,unique,counts,lists_of_distances):
     percentage_medium = counter_medium/len(houses)
     percentage_small = 1 - (percentage_large+percentage_medium)
     fitness = nd_small_house.pdf(percentage_small)+nd_medium_house.pdf(percentage_medium)+nd_large_house.pdf(percentage_large)
-    fitness *=1.5
+    fitness *=1.5 # TODO: review and maybe remove
+    fitness = fitness * coef_diversity_of_housing
+    if(fitness<=0): return 0
     if(fitness>=100): return 100
-    return coef_diversity_of_housing*fitness
+    return fitness
 
 "5"
 def div_o(solution,unique,counts,lists_of_distances):
@@ -121,15 +129,20 @@ def div_o(solution,unique,counts,lists_of_distances):
     percentage_small = 1 - (percentage_large+percentage_medium)
     fitness = nd_small_office.pdf(percentage_small)+nd_medium_office.pdf(percentage_medium)+nd_large_office.pdf(percentage_large)
     fitness *= 1.5
+    fitness = fitness * coef_diversity_of_housing
+    if(fitness<=0): return 0
     if(fitness>=100): return 100
-    return coef_diversity_of_housing*fitness
+    return fitness
 
 "6"
 "Takes the closest office to each residence, without taking in account if people will fit in those offices (like a vertical no limit density)"
 def h_o_walk(solution,unique,counts,lists_of_distances):
     fitness = 0
     fitness=1/(np.mean(lists_of_distances[0]))
-    return coef_house_office_walkable*fitness
+    fitness = coef_house_office_walkable * fitness
+    if(fitness<=0): return 0
+    if(fitness>=100): return 100
+    return fitness
 
 "7"
 "Houses count double in this acces to parks"
@@ -137,7 +150,10 @@ def acc_p(solution,unique,counts,lists_of_distances):
     fitness = 0
     mean_of_all_distances = (2*np.mean(lists_of_distances[1]) + np.mean(lists_of_distances[3]))/3
     fitness = 1/mean_of_all_distances
-    return fitness*coef_access_to_parks
+    fitness = fitness * coef_access_to_parks
+    if(fitness<=0): return 0
+    if(fitness>=100): return 100
+    return fitness
 
 
 "8"
@@ -147,14 +163,17 @@ def h_o_balance(solution,unique,counts,lists_of_distances):
     nb_people_working = len(np.where(solution==2))*office_density
     if (nb_people_living<=nb_people_working): fitness=nb_people_living/nb_people_working*100
     else: fitness=nb_people_working/nb_people_living*100
+    if(fitness<=0): return 0
+    if(fitness>=100): return 100
     return fitness
 
 "9"
 def peop_fit(solution, unique, counts,lists_of_distances):
-    if (len(np.where(solution == 3)[0])<min_num_people_to_fit/residence_density): return 0 #This solution can't fit the number of people needed
-    return 100
+    fitness = len(np.where(solution == 3)[0])/(min_num_people_to_fit/residence_density)*100
+    if(fitness<=0): return 0
+    if(fitness>=100): return 100
+    return fitness
 
-"10"
 def dist_h_o_p(solution):
     parks = np.where(solution == 1)
     offices = np.where(solution == 2)
