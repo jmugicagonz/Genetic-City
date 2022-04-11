@@ -85,18 +85,18 @@ class MainMachine(StateMachine):
         # Start the thread
         self.th.start()
         print("WHENEVER YOU ARE READY, PLAY THE GENETIC ALGORITHM")
-        while not self.bool_continue_GM:
+        '''while not self.bool_continue_GM:
             print("Waiting to start. Replace the pause button by the play")
-            time.sleep(1)
+            time.sleep(1)'''
         print("STARTING GENETIC ALGORITHM")
         music.play_music()
-        while self.bool_continue_GM:
-        #while True:
+        '''while self.bool_continue_GM:'''
+        while True:
             print("Generation : ", self.generation)
             self.genMachine.compute_generation()
             if self.generation%5 == 0: #Send values each five generations
                 max_height = int((self.generation+1)*2)
-                if max_height>500: max_height=500
+                if max_height>250: max_height=250
                 landUses_to_send = self.genMachine.population_matrix[0, :]
                 indicators_to_send = self.genMachine.list_of_dictionaries_rules[0]
                 print("Indicators to send are: {}".format(indicators_to_send))
@@ -106,13 +106,13 @@ class MainMachine(StateMachine):
                     randomTall = np.random.uniform(0.0,1.0)
                     randomH = np.random.randint(0.0,float(max_height))
                     if landUses_to_send[i] == 2: 
-                        if randomTall >= 0.9: height = 4*randomH
-                        elif randomTall >= 0.5: height = 2*randomH
+                        if randomTall >= 0.9: height = 2*randomH
+                        elif randomTall >= 0.5: height = randomH
                         else: height = randomH
                     elif landUses_to_send[i] == 3: 
-                        if randomTall >= 0.8: height = 2*randomH
-                        elif randomTall >= 0.5: height = randomH
-                        else: height = int(0.5*randomH)
+                        if randomTall >= 0.8: height = randomH
+                        elif randomTall >= 0.5: height = int(0.5*randomH)
+                        else: height = int(0.25*randomH)
                     elif landUses_to_send[i] == 1: height = 0
                     self.grid_to_send[i] = [landUses_to_send[i],height]
                     self.grid_to_send_projection[i] = [landUses_to_send[i],0]
@@ -215,7 +215,7 @@ class MainMachine(StateMachine):
             self.genMachine.compute_generation()
             if self.generation%5 == 0: # Send values each five generations
                 max_height = int((self.generation+1)*2)
-                if max_height>500: max_height=500
+                if max_height>250: max_height=250
                 landUses_to_send = self.genMachine.population_matrix[0, :]
                 indicators_to_send = self.genMachine.list_of_dictionaries_rules[0]
                 print("Indicators to send are: {}".format(indicators_to_send))
@@ -227,13 +227,13 @@ class MainMachine(StateMachine):
                         randomTall = np.random.uniform(0.0,1.0)
                         randomH = np.random.randint(0.0,float(max_height))
                         if landUses_to_send[i] == 2: 
-                            if randomTall >= 0.9: height = 4*randomH
-                            elif randomTall >= 0.5: height = 2*randomH
-                            else: height = randomH
-                        elif landUses_to_send[i] == 3: 
-                            if randomTall >= 0.8: height = 2*randomH
+                            if randomTall >= 0.9: height = 2*randomH
                             elif randomTall >= 0.5: height = randomH
                             else: height = int(0.5*randomH)
+                        elif landUses_to_send[i] == 3: 
+                            if randomTall >= 0.8: height = randomH
+                            elif randomTall >= 0.5: height = int(0.5*randomH)
+                            else: height = int(0.25*randomH)
                         elif landUses_to_send[i] == 1: height = 0
                     self.grid_to_send[i] = [landUses_to_send[i],height]
                     self.grid_to_send_projection[i] = [landUses_to_send[i],0]
