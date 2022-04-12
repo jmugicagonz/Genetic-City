@@ -51,7 +51,6 @@ def green_width(solution,unique,counts,lists_of_distances):
             new_res_dict[tup1] |= res_dict.get(tup2)
         #Now we will prize those nodes being connected to multiple other nodes
         fitness += sum(pow(len(cluster),2) for cluster in new_res_dict.values() if len(cluster)>1) ####np.exp(len(cluster)-1)
-<<<<<<< HEAD
         corners = 4*pow(3,2)
         ideal_park_size = int(np.sqrt(len(parks)))
         edge_rows_and_columns = 4*(ideal_park_size-2)*pow(5,2)
@@ -61,17 +60,6 @@ def green_width(solution,unique,counts,lists_of_distances):
         fitness = coef_green_space_balance_width*fitness
     if (fitness >= 100): return 100
     elif (fitness < 0): return 0
-=======
-    corners = 4*pow(3,2)
-    ideal_park_size = int(np.sqrt(len(parks)))
-    edge_rows_and_columns = 4*(ideal_park_size-2)*pow(5,2)
-    inside = (ideal_park_size*ideal_park_size-4*ideal_park_size)*pow(8,2)
-    max_green_space_balance_width = corners+edge_rows_and_columns+inside
-    coef_green_space_balance_width = 2/max_green_space_balance_width*100
-    fitness = coef_green_space_balance_width*fitness
-    if (fitness<=0): return 0
-    if (fitness>=100): return 100
->>>>>>> c7dbb504687dc3862f32bee15490f75b0626535b
     return fitness
 
 "4"    
@@ -103,16 +91,11 @@ def div_h(solution,unique,counts,lists_of_distances):
     percentage_large = counter_large/len(houses)
     percentage_medium = counter_medium/len(houses)
     percentage_small = 1 - (percentage_large+percentage_medium)
-<<<<<<< HEAD
-    fitness = nd_small_house.pdf(percentage_small) + nd_medium_house.pdf(percentage_medium) + nd_large_house.pdf(percentage_large)
-    fitness = coef_diversity_of_housing * 1.5 * fitness
-=======
     fitness = nd_small_house.pdf(percentage_small)+nd_medium_house.pdf(percentage_medium)+nd_large_house.pdf(percentage_large)
     fitness *=1.5 # TODO: review and maybe remove
     fitness = fitness * coef_diversity_of_housing
     if(fitness<=0): return 0
     if(fitness>=100): return 100
->>>>>>> c7dbb504687dc3862f32bee15490f75b0626535b
     return fitness
 
 "5"
@@ -144,16 +127,11 @@ def div_o(solution,unique,counts,lists_of_distances):
     percentage_large = counter_large/len(offices)
     percentage_medium = counter_medium/len(offices)
     percentage_small = 1 - (percentage_large+percentage_medium)
-<<<<<<< HEAD
-    fitness = nd_small_office.pdf(percentage_small) + nd_medium_office.pdf(percentage_medium) + nd_large_office.pdf(percentage_large)
-    fitness = coef_diversity_of_housing * 1.5 * fitness
-=======
     fitness = nd_small_office.pdf(percentage_small)+nd_medium_office.pdf(percentage_medium)+nd_large_office.pdf(percentage_large)
     fitness *= 1.5
     fitness = fitness * coef_diversity_of_housing
     if(fitness<=0): return 0
     if(fitness>=100): return 100
->>>>>>> c7dbb504687dc3862f32bee15490f75b0626535b
     return fitness
 
 "6"
