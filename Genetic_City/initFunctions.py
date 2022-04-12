@@ -1,4 +1,5 @@
 import scipy.stats
+from scipy.spatial.distance import cityblock
 
 from parameters import *
 
@@ -35,6 +36,15 @@ max_distance = np.max(distance_table)
 coef_house_office_walkable = 100
 coef_access_to_parks = 100
 
+#Function to calculate the diversity
+
+def manhattan_dist_diversity(case_dict, target_dict):
+    if len(case_dict)==0:
+        return None
+    case_counts=[case_dict[s] if s in case_dict else 0 for s in target_dict]
+    target_counts=[target_dict[s] for s in target_dict]
+    max_deviation=sum([max(c, 1-c) for c in target_counts])
+    return 1-cityblock(case_counts, target_counts)/max_deviation
 
 
 

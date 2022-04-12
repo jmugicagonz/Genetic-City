@@ -68,6 +68,7 @@ size_medium_house = 2
 percentage_small_housing = 0.2
 percentage_medium_housing = 0
 percentage_large_housing = 0.8
+target_dict_housing = [percentage_small_housing, percentage_medium_housing, percentage_large_housing]
 
 "Rule 5: Diversity of office"
 #Size of office >= (e.g: size_large_office = 3 means that every office composed by 3 or more nodes will be considered large)
@@ -79,6 +80,7 @@ size_medium_office = 2
 percentage_small_office = 0.2
 percentage_medium_office = 0
 percentage_large_office = 0.8
+target_dict_office = [percentage_small_office, percentage_medium_office, percentage_large_office]
 
 '''PARAMETERS FOR PLOTS'''
 num_generations_saved = 20 # >=1
@@ -89,8 +91,14 @@ save_data = False
 '''PARAMETERS ARUCO TAGS'''
 id_play = 227 # Id of the Aruco tag representing the play buttong
 id_pause = 128 # Id of the Aruco tag representing the pause button
+<<<<<<< HEAD
+id_block = 12 # Id of the Aruco tag representing the block cell
+pos_play_pause = 49 # Position of the Aruco tag for the play/pause button
+
+=======
 id_block = 12 # Id of the Aruco tag representing the block button
 id_campus = 3 # Id of the Aruco tag representing the campus button
 id_industry = 8 # Id of the Aruco tag representing the industry button
 id_residence = 19 # Id of the Aruco tag representing the residence button
 pos_play_pause = 49 # Position of the Aruco tag for the play/pause button
+>>>>>>> c7dbb504687dc3862f32bee15490f75b0626535b
