@@ -91,14 +91,8 @@ save_data = False
 '''PARAMETERS ARUCO TAGS'''
 id_play = 227 # Id of the Aruco tag representing the play buttong
 id_pause = 128 # Id of the Aruco tag representing the pause button
-<<<<<<< HEAD
-id_block = 12 # Id of the Aruco tag representing the block cell
-pos_play_pause = 49 # Position of the Aruco tag for the play/pause button
-
-=======
 id_block = 12 # Id of the Aruco tag representing the block button
 id_campus = 3 # Id of the Aruco tag representing the campus button
 id_industry = 8 # Id of the Aruco tag representing the industry button
 id_residence = 19 # Id of the Aruco tag representing the residence button
 pos_play_pause = 49 # Position of the Aruco tag for the play/pause button
->>>>>>> c7dbb504687dc3862f32bee15490f75b0626535b
