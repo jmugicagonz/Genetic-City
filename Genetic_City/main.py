@@ -20,8 +20,8 @@ import matplotlib.pyplot as plt  # Plotting
 import numpy as np  # Matrix and array handling.
 import ray
 
-from parameters import *
 
+from parameters import *
 from mainMachine import *
 from plotting import *  # Functions for plotting
 
